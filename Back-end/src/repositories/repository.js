@@ -17,7 +17,7 @@ export async function getOrder(orderId) {
         include: [
             {
                 model: Item,
-                attributes: ['name', 'price', 'menuId'],
+                attributes: ['id', 'name', 'price', 'menuId'],
                 through: { attributes: ['quantity'] }
             },
         ]

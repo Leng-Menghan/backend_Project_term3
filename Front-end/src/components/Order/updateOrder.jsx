@@ -15,7 +15,6 @@ const UpdateOrder = () => {
     const { id } = useParams();
 
     const [orderedItems, setOrderedItems] = useState([]);
-    // const [orderedMenus, setOrderedMenus] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState([]);
 // For create Order
     const [itemsList, setItemsList] = useState([]);
@@ -43,7 +42,9 @@ const UpdateOrder = () => {
     useEffect(() => {
         axios.get(`http://localhost:3000/order/${id}`)
             .then(response => {
-            setOrderedItems(response.data.items);
+            setOrderedItems(
+                response.data.items.map(item => ({...item,quantity: item.orderItem.quantity }))
+            );
             setGuest(response.data.guest);
             setTableId(response.data.tableId);
         })
@@ -101,8 +102,8 @@ const UpdateOrder = () => {
                 <div className="col-3">
                     <Payment
                         ordered={orderedItems}
-                        onDelete={(id) => setOrderedItems(orderedItems.filter(item => item.id !== id))}
-                        onItemsChange={setItemsList}
+                        onDelete={(id) => setOrderedItems(prev => prev.filter(item => item.id !== id))}
+                        sendItemsList={setItemsList}
                     />
                     <button onClick={handleUpdateOrder} className="btn btn-success w-100 mt-3">
                         <i className="fa-solid fa-arrow-right"> Update</i>

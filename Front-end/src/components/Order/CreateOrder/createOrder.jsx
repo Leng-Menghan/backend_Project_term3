@@ -56,7 +56,7 @@ const CreateOrder = () => {
     const handleAddToOrder = (item) => {
         const exists = orderedItems.find(order => order.id === item.id);
         if (!exists) {
-            setOrderedItems([...orderedItems, item]);
+            setOrderedItems([...orderedItems, { ...item, quantity: 1 }]);
         }
     };
 
@@ -94,8 +94,8 @@ const CreateOrder = () => {
                 <div className="col-3">
                     <Payment
                         ordered={orderedItems}
-                        onDelete={(id) => setOrderedItems(orderedItems.filter(item => item.id !== id))}
-                        onItemsChange={setItemsList}
+                        onDelete={(id) => setOrderedItems(prev => prev.filter(item => item.id !== id))}
+                        sendItemsList={setItemsList}
                     />
                     <button onClick={handleCreateOrder} className="btn btn-success w-100 mt-3">
                         <i className="fa-solid fa-arrow-right"></i>
