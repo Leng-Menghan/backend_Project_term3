@@ -19,7 +19,6 @@ async function main() {
         await createItem("Burger", 5.99, 1);
         await createItem("Fries", 2.99, 1);
         await createItem("Coke", 1.99, 1);
-
         const app = express();
         app.use(cors());
         app.use(express.json());

@@ -1,13 +1,5 @@
 import { useState } from "react";
 const Item = ({ item }) => {
-    const [Qty, setQty] = useState(0);
-    const minus = () => {
-        setQty(Qty - 1)
-        if (Qty === 0) {
-            setQty(0)
-        }
-    };
-    const plus = () => { setQty(Qty + 1) };
     return (
         <div
       className="card text-light rounded-3 shadow-sm p-3 border-0"

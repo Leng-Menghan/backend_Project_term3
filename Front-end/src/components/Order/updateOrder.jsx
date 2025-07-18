@@ -64,7 +64,7 @@ const UpdateOrder = () => {
     const handleAddToOrder = (item) => {
         const exists = orderedItems.find(order => order.id === item.id);
         if (!exists) {
-            setOrderedItems([...orderedItems, item]);
+            setOrderedItems([...orderedItems, { ...item, quantity: 1 }]);
         }
     };
 

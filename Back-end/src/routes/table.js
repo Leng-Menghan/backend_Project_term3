@@ -1,7 +1,8 @@
 import express from "express";
-import {get} from "../controllers/table.js";
+import {getAll, create, updateStatus} from "../controllers/table.js";
 
 const tableRouter = express.Router();
-tableRouter.get("/getTables", get);
-
+tableRouter.get("/getTables", getAll);
+tableRouter.post("/create", create);
+tableRouter.put("/updateStatus/:id", updateStatus);
 export default tableRouter;

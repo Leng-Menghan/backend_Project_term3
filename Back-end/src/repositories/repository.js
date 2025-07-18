@@ -48,6 +48,7 @@ export async function updateOrder(guest, tableId, items, orderId) {
     }
 }
 
+
 export async function deleteOrder(orderId) {
     const order = await Order.findByPk(orderId);
     await order.destroy();
@@ -61,6 +62,12 @@ export async function updateOrderStatus(orderId, status) {
 // Tables
 export async function createTable(name, status, seat) {
     const table = await Table.create({ name, status, seat });
+    return table;
+}
+export async function updateTableStatus(tableId, status) {
+    const table = await Table.findByPk(tableId);
+    if (!table) throw new Error("Table not found");
+    await table.update({ status });
 }
 export async function getTables() {
     const tables = await Table.findAll();
@@ -69,6 +76,7 @@ export async function getTables() {
 // Items
 export async function createItem(name, price, menuId) {
     const item = await Item.create({ name, price, menuId });
+    return item;
 }
 
 export async function getItems() {
@@ -76,12 +84,50 @@ export async function getItems() {
     return items;
 }
 
+export async function getItem(id) {
+    const item = await Item.findByPk(id);
+    return item;
+}
+
+export async function updateItem(id, name, price, menuId) {
+    const item = await Item.findByPk(id);
+    await item.update({ name, price, menuId });
+    return item;
+}
+
+export async function deleteItem(id) {
+    const item = await Item.findByPk(id);
+    await item.destroy();
+}
+
+export async function getItemsByMenuId(menuId) {
+    const items = await Item.findAll({ where: { menuId } });
+    return items;
+}
+
 // Menu
 export async function createMenu(category, icon) {
     const menu = await Menu.create({ category, icon });
+    return menu;
 }
 
 export async function getMenus() {
     const menus = await Menu.findAll();
     return menus;
+}
+
+export async function getMenu(id) {
+    const menu = await Menu.findByPk(id);
+    return menu;
+}
+
+export async function updateMenu(id, category, icon) {
+    const menu = await Menu.findByPk(id);
+    await menu.update({ category, icon });
+    return menu;
+}
+
+export async function deleteMenu(id) {
+    const menu = await Menu.findByPk(id);
+    await menu.destroy();
 }
