@@ -41,6 +41,8 @@ const itemCard = ({item, onDelete}) => {
                     </div>
                 </div>
             </div>
+
+            
             {/* Modal edit item */}
             <div
                 className="modal fade"

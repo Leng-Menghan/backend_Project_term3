@@ -2,10 +2,10 @@ import Order from "../models/order.js";
 import Item from "../models/item.js";
 import Menu from "../models/menu.js";
 import Table from "../models/table.js";
-
+import orderItem from "../models/orderItem.js";
 // Orders
-export async function createOrder(status, guest, tableId, items) {
-    const order = await Order.create({ status, guest, tableId });
+export async function createOrder(status, guest, tableId, items, amount, paymentStatus) {
+    const order = await Order.create({ status, guest, tableId, amount, paymentStatus });
     for (const { id, quantity } of items) {
         await order.addItem(id, { through: { quantity } });
     }
@@ -27,7 +27,7 @@ export async function getOrder(orderId) {
 
 export async function getOrders() {
     const orders = await Order.findAll({
-        attributes: ['id', 'status', 'guest', 'tableId', 'createdAt'],
+        attributes: ['id', 'status', 'guest', 'tableId', 'createdAt', 'paymentStatus', 'amount'],
         include: [
             {
                 model: Item,
@@ -38,10 +38,10 @@ export async function getOrders() {
     });
     return orders;
 }
-export async function updateOrder(guest, tableId, items, orderId) {
+export async function updateOrder(guest, tableId, items, orderId, amount, paymentStatus) {
     const order = await Order.findByPk(orderId);
     if (!order) throw new Error("Order not found");
-    await order.update({guest, tableId });
+    await order.update({guest, tableId , amount, paymentStatus});
     await order.setItems([]);
     for (const { id, quantity } of items) {
         await order.addItem(id, { through: { quantity } });
@@ -59,6 +59,13 @@ export async function updateOrderStatus(orderId, status) {
     if (!order) throw new Error("Order not found");
     await order.update({ status });
 }
+
+export async function updatePaymentStatus(orderId, paymentStatus) {
+    const order = await Order.findByPk(orderId);
+    if (!order) throw new Error("Order not found");
+    await order.update({ paymentStatus });
+}
+
 // Tables
 export async function createTable(name, status, seat) {
     const table = await Table.create({ name, status, seat });
@@ -72,6 +79,22 @@ export async function updateTableStatus(tableId, status) {
 export async function getTables() {
     const tables = await Table.findAll();
     return tables;
+}
+
+export async function getTable(id) {
+    const table = await Table.findByPk(id);
+    return table;
+}
+
+export async function updateTable(id, name, seat) {
+    const table = await Table.findByPk(id);
+    await table.update({ name, seat });
+    return table;
+}
+
+export async function deleteTable(id) {
+    const table = await Table.findByPk(id);
+    await table.destroy();
 }
 // Items
 export async function createItem(name, price, menuId) {
@@ -130,4 +153,26 @@ export async function updateMenu(id, category, icon) {
 export async function deleteMenu(id) {
     const menu = await Menu.findByPk(id);
     await menu.destroy();
+}
+
+// Payment
+export async function createPayment(orderId, status, method, amount) {
+    const order = await Order.findByPk(orderId);
+    await order.create({ status, method, amount });
+    return order;
+}
+
+// OrderItem
+export async function getOrderItems() {
+    const orderItems = await orderItem.findAll(
+        {
+            include: [
+                {
+                    model: Item,
+                    attributes: ['id', 'name', 'price', 'menuId'],
+                },
+            ]
+        }
+    );
+    return orderItems;
 }

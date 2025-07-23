@@ -3,7 +3,7 @@ import ViewOrder from './viewOrder.jsx';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-const OrderCard = ({ order, onDelete, onStatusChange }) => {
+const OrderCard = ({ order, onDelete, onStatusChange, onPaymentStatusChange }) => {
   const calTotal = () => {
     let total = 0;
     order.items.forEach((item) => {
@@ -15,6 +15,15 @@ const OrderCard = ({ order, onDelete, onStatusChange }) => {
     axios.put(`http://localhost:3000/order/updateStatus/${orderId}`, { status: newStatus })
       .then(() => {
         onStatusChange(orderId, newStatus);
+      })
+      .catch((error) => {
+        console.error('Error updating order status:', error);
+      });
+  }
+  const handlePaymentStatusChange = (orderId, newStatus) => {
+    axios.put(`http://localhost:3000/order/updatePaymentStatus/${orderId}`, { paymentStatus: newStatus })
+      .then(() => {
+        onPaymentStatusChange(orderId, newStatus);
       })
       .catch((error) => {
         console.error('Error updating order status:', error);
@@ -47,17 +56,39 @@ const OrderCard = ({ order, onDelete, onStatusChange }) => {
         </div>
 
         {/* Status */}
-        <div className="text-end">
-          <div className={`badge mb-1 ${order.status === 'Ready' ? 'bg-success' : 'bg-warning'}`} 
-            onClick={() => handleStatusChange(order.id, order.status === 'Ready' ? 'In Progress' : 'Ready')}
+        <div className="text-end d-flex flex-column">
+          <div className={`badge mb-1 ${order.status === 'In Progress' ? 'bg-warning' : order.status === 'Ready' ? 'bg-primary' : 'bg-success'}`}
+            onClick={() => handleStatusChange(
+              order.id,
+              order.status === 'In Progress'
+                ? 'Ready'
+                : order.status === 'Ready'
+                  ? 'Completed'
+                  : 'Completed' // or keep it as 'Completed' if already completed
+            )}
+
             style={{ cursor: 'pointer' }}
-            >
-            {order.status === 'Ready' ? (
+          >
+            {order.status === 'In Progress' ? (
+              <i className="fa-solid fa-hourglass-start me-1"></i>
+            ) : order.status === 'Ready' ? (
+              <i className="fa-solid fa-check me-1"></i>
+            ) : (
+              <i className="fa-solid fa-check-double me-1"></i>
+            )}
+            {order.status}
+          </div>
+          {/* payment status */}
+          <div className={`badge mb-1 ${order.paymentStatus === 'Paid' ? 'bg-success' : 'bg-danger'}`}
+            onClick={() => handlePaymentStatusChange(order.id, order.paymentStatus === 'Paid' ? 'Unpaid' : 'Paid')}
+            style={{ cursor: 'pointer' }}
+          >
+            {order.paymentStatus === 'Paid' ? (
               <i className="fa-solid fa-check-double me-1"></i>
             ) : (
               <i className="fa-solid fa-hourglass-start me-1"></i>
             )}
-            {order.status}
+            {order.paymentStatus}
           </div>
         </div>
       </div>
@@ -108,7 +139,7 @@ const OrderCard = ({ order, onDelete, onStatusChange }) => {
               <h5 class="modal-title" id="staticBackdropLabel">Order Details</h5>
             </div>
             <div class="modal-body">
-              <ViewOrder ordered={order} totalPrice={calTotal().toFixed(2)}/>
+              <ViewOrder ordered={order} totalPrice={calTotal().toFixed(2)} />
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
@@ -126,7 +157,7 @@ const OrderCard = ({ order, onDelete, onStatusChange }) => {
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onClick ={() => handleDelete(order.id)}>Confrim</button>
+              <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onClick={() => handleDelete(order.id)}>Confrim</button>
             </div>
           </div>
         </div>

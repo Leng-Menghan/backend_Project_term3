@@ -15,6 +15,9 @@ Order.belongsToMany(Item, { through: orderItem });
 Table.hasMany(Order);
 Order.belongsTo(Table);
 
+// OrderItem and Item
+orderItem.belongsTo(Item, { foreignKey: 'itemId' });
+Item.hasMany(orderItem, { foreignKey: 'itemId' });
 
 
 

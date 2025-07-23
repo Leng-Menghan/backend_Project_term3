@@ -1,4 +1,4 @@
-import {getTables, createTable, updateTableStatus} from "../repositories/repository.js";
+import {getTables, createTable, updateTableStatus, getTable, updateTable, deleteTable} from "../repositories/repository.js";
 
 export async function getAll(req, res) {
     const tables = await getTables();
@@ -16,4 +16,23 @@ export async function updateStatus(req, res) {
     const {status} = req.body;
     const table = await updateTableStatus(id, status);
     res.status(200).json(table);
+}
+
+export async function get(req, res) {
+    const {id} = req.params;
+    const table = await getTable(id);
+    res.status(200).json(table);
+}
+
+export async function update(req, res) {
+    const {id} = req.params;
+    const {name, seat} = req.body;
+    const table = await updateTable(id, name, seat);
+    res.status(200).json(table);
+}
+
+export async function remove(req, res) {
+    const {id} = req.params;
+    const table = await deleteTable(id);
+    res.status(200).json("Delete success");
 }

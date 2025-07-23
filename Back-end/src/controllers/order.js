@@ -1,15 +1,15 @@
-import {createOrder, getOrder, getOrders, updateOrder, deleteOrder, updateOrderStatus} from '../repositories/repository.js';
+import {createOrder, getOrder, getOrders, updateOrder, deleteOrder, updateOrderStatus, updatePaymentStatus} from '../repositories/repository.js';
 
 export async function create(req, res) {
-    const { status, guest, tableId, items } = req.body;
-    const order = await createOrder(status, guest, tableId, items);
+    const { status, guest, tableId, items, amount, paymentStatus } = req.body;
+    const order = await createOrder(status, guest, tableId, items, amount, paymentStatus);
     res.status(201).json("Create order success");
 }
 
 export async function update(req, res) {
     const { id } = req.params;
-    const { guest, tableId, items } = req.body;
-    const order = await updateOrder( guest, tableId, items, id);
+    const { guest, tableId, items, amount, paymentStatus } = req.body;
+    const order = await updateOrder( guest, tableId, items, id, amount, paymentStatus);
     res.status(200).json(order);
 }
 
@@ -37,3 +37,9 @@ export async function remove(req, res) {
     res.status(200).json("Delete success");
 }
 
+export async function updatePayment(req, res) {
+    const { id } = req.params;
+    const { paymentStatus } = req.body;
+    const order = await updatePaymentStatus(id, paymentStatus);
+    res.status(200).json("Update payment status success");
+}

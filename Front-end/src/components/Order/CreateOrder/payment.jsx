@@ -1,8 +1,8 @@
 import Order from './order.jsx';
 import { useState, useEffect } from 'react';
 // Input : ordered
-// Output : onDelete(id), sendItemsList(itemsList)
-const payment = ({ ordered, onDelete, sendItemsList }) => {
+// Output : onDelete(id), sendItemsList(itemsList), amount
+const payment = ({ ordered, onDelete, sendItemsList, amount, paymentStatus, isUpdate }) => {
     const [itemsList, setItemsList] = useState([]);
 
     const handleDelete = (id) => {
@@ -24,6 +24,7 @@ const payment = ({ ordered, onDelete, sendItemsList }) => {
     const grandTotal = itemsList.reduce((total, item) => total + (item.total || 0), 0);
     useEffect(() => {
         sendItemsList(itemsList.filter(item => item.quantity > 0));
+        amount(grandTotal);
     }, [itemsList]);
     return (
         <div className="container rounded p-3 text-light" style={{ backgroundColor: '#212529' }} >
@@ -40,7 +41,16 @@ const payment = ({ ordered, onDelete, sendItemsList }) => {
             </div>
             <div className="d-flex justify-content-between align-items-center mt-4">
                 <h4 className="me-auto">Total: {grandTotal.toFixed(2)} $</h4>
-                <button className="btn btn-primary">Payment</button>
+                {!isUpdate && (
+                    <select className="form-select" style={{ width: '160px' }} onChange={(e) => paymentStatus(e.target.value)}>
+                    <option value="Unpaid">
+                        Unpaid
+                    </option>
+                    <option value="Paid">
+                        Paid
+                    </option>
+                </select>
+                )}
             </div>
         </div>
     );

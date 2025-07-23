@@ -11,8 +11,8 @@ function App() {
       <Nav />
       <div className="flex-grow-1 fixed-height-screen">
         <Routes>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/table" element={<Table />} />
+          <Route path="/dashboard" index element={<Dashboard />} />
+          <Route path="/table/*" element={<Table />} />
           <Route path="/menu" element={<Menu />} />
           <Route path="/order/*" element={<Order />} />
         </Routes>

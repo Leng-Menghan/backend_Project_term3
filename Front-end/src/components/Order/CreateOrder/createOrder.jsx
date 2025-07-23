@@ -11,15 +11,19 @@ const handleBack = () => {
 
 const CreateOrder = () => {
     const navigate = useNavigate();
+    const Today = new Date().toISOString().split('T')[0];
 
     const [orderedItems, setOrderedItems] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState(null);
-// For create Order
+    // For create Order
     const [itemsList, setItemsList] = useState([]);
     const [guest, setGuest] = useState(0);
     const [tableId, setTableId] = useState(0);
-// For get
+    const [amount, setAmount] = useState(0);
+    const [paymentStatus, setPaymentStatus] = useState('Unpaid');
+    // For get
     const [tables, setTables] = useState([]);
+    const [tableSeats, setTableSeats] = useState([]);
     const [menus, setMenus] = useState([]);
     const [items, setItems] = useState([]);
     const handleCreateOrder = async () => {
@@ -27,7 +31,9 @@ const CreateOrder = () => {
             status: "In Progress",
             guest: guest,
             tableId: tableId,
-            items: itemsList
+            items: itemsList,
+            amount: amount,
+            paymentStatus: paymentStatus
         };
 
         try {
@@ -42,17 +48,34 @@ const CreateOrder = () => {
     useEffect(() => {
         axios.get('http://localhost:3000/table/getTables')
             .then(response => {
-            setTables(response.data);
-        })
+                setTables(response.data);
+            })
         axios.get('http://localhost:3000/menu/getMenus')
             .then(response => {
-            setMenus(response.data);
-        })
+                setMenus(response.data);
+            })
         axios.get('http://localhost:3000/item/getItems')
             .then(response => {
-            setItems(response.data);
-        })
+                setItems(response.data);
+            })
+        axios.get('http://localhost:3000/order/getOrders')
+            .then(response => {
+                const filtered = response.data.filter(order =>
+                    order.createdAt?.startsWith(Today) && order.status === "In Progress" || order.status === "Ready"
+                );
+                const aggregated = {};
+                filtered.forEach(({ tableId, guest }) => {
+                    if (aggregated[tableId]) {
+                        aggregated[tableId].guest += guest;
+                    } else {
+                        aggregated[tableId] = { tableId: tableId, guest: guest };
+                    }
+                });
+                const result = Object.values(aggregated);
+                setTableSeats(result);
+            })
     }, []);
+
     const handleAddToOrder = (item) => {
         const exists = orderedItems.find(order => order.id === item.id);
         if (!exists) {
@@ -73,13 +96,24 @@ const CreateOrder = () => {
                 </div>
                 <form className="d-flex bg-success rounded p-2">
                     <div className="mx-3 d-flex align-items-center" style={{ width: '300px' }}>
-                        <select className="form-select" onChange={(e) => setTableId(e.target.value)}>
+                        <select className="form-select" onChange={(e) => setTableId(Number(e.target.value))}>
                             <option selected disabled hidden>Select Table</option>
-                            {tables.map((table) => (
-                                <option key={table.id} value={table.id} className={table.status === 'Available' ? 'text-success' : 'text-warning'}>
-                                    {table.name} - Available seat: {table.seat}
-                                </option>
-                            ))}
+                            {tables.map((table) => {
+                                const guest = tableSeats.find(t => t.tableId === table.id)?.guest || 0;
+                                const availableSeat = table.seat - guest;
+                                if (availableSeat <= 0) {
+                                    return null;
+                                }
+                                return (
+                                    <option
+                                        key={table.id}
+                                        value={table.id}
+                                        className="text-success"
+                                    >
+                                        {table.name} - Available seat: {availableSeat}
+                                    </option>
+                                );
+                            })}
                         </select>
                     </div>
                     <div className="mx-3 d-flex align-items-center">
@@ -96,9 +130,11 @@ const CreateOrder = () => {
                         ordered={orderedItems}
                         onDelete={(id) => setOrderedItems(prev => prev.filter(item => item.id !== id))}
                         sendItemsList={setItemsList}
+                        amount={setAmount}
+                        paymentStatus={setPaymentStatus}
                     />
                     <button onClick={handleCreateOrder} className="btn btn-success w-100 mt-3">
-                        <i className="fa-solid fa-arrow-right"></i>
+                        Create
                     </button>
                 </div>
 

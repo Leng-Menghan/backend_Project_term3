@@ -20,6 +20,8 @@ const UpdateOrder = () => {
     const [itemsList, setItemsList] = useState([]);
     const [guest, setGuest] = useState(0);
     const [tableId, setTableId] = useState(0);
+    const [amount, setAmount] = useState(0);
+    const [paymentStatus, setPaymentStatus] = useState('');
 // For get
     const [tables, setTables] = useState([]);
     const [menus, setMenus] = useState([]);
@@ -28,7 +30,9 @@ const UpdateOrder = () => {
         const data = {
             guest: guest,
             tableId: tableId,
-            items: itemsList
+            items: itemsList,
+            amount: amount,
+            paymentStatus: paymentStatus
         };
         try {
             const response = await axios.put(`http://localhost:3000/order/${id}`, data);
@@ -47,6 +51,8 @@ const UpdateOrder = () => {
             );
             setGuest(response.data.guest);
             setTableId(response.data.tableId);
+            setAmount(response.data.amount);
+            setPaymentStatus(response.data.paymentStatus);
         })
         axios.get('http://localhost:3000/table/getTables')
             .then(response => {
@@ -104,6 +110,9 @@ const UpdateOrder = () => {
                         ordered={orderedItems}
                         onDelete={(id) => setOrderedItems(prev => prev.filter(item => item.id !== id))}
                         sendItemsList={setItemsList}
+                        amount={setAmount}
+                        paymentStatus={setPaymentStatus}
+                        isUpdate={true}
                     />
                     <button onClick={handleUpdateOrder} className="btn btn-success w-100 mt-3">
                         <i className="fa-solid fa-arrow-right"> Update</i>
