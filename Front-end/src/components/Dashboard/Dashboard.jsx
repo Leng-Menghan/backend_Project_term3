@@ -1,4 +1,4 @@
-import GuestPerWeek from "./guestPerWeek";
+import GuestGraph from "./guestGraph.jsx";
 import Income from "./Income.jsx";
 import Item from "./countNumber/Item.jsx";
 import Guest from "./countNumber/Guest.jsx";
@@ -8,34 +8,27 @@ import TopSell from "./topSell.jsx";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+// Format any ISO string or Date to "YYYY-MM-DD" in local time
+function toLocalDate(dateInput) {
+  const date = new Date(dateInput);
+  return date.toLocaleDateString('en-CA');
+}
+
 function Dashboard() {
-  // Get today's date in "YYYY-MM-DD" format (local time)
-  const Today = new Date().toISOString().split('T')[0];
+  const today = toLocalDate(new Date());
 
-  // Helper to format Date object to "YYYY-MM-DD" in local time
-  function formatDateLocal(date) {
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0'); // month 1-12
-    const dd = String(date.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  }
-
-  // Calculate first and last day of current month (local time)
-  const year = Number(Today.slice(0, 4));
-  const month = Number(Today.slice(5, 7)) - 1;
-
+  // Get first and last day of current month
+  const year = Number(today.slice(0, 4));
+  const month = Number(today.slice(5, 7)) - 1;
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
+  const start = toLocalDate(firstDay);
+  const end = toLocalDate(lastDay);
 
-  // Format for date inputs
-  const start = formatDateLocal(firstDay);
-  const end = formatDateLocal(lastDay);
-
-  // State
   const [itemQty, setItemQty] = useState(0);
   const [guestQty, setGuestQty] = useState(0);
   const [orderQty, setOrderQty] = useState(0);
-  const [date, setDate] = useState(Today);
+  const [date, setDate] = useState(today);
   const [price, setPrice] = useState(0);
   const [orderItem, setOrderItem] = useState([]);
 
@@ -45,83 +38,71 @@ function Dashboard() {
   const [startDate, setStartDate] = useState(start);
   const [endDate, setEndDate] = useState(end);
 
-  // Fetch data when date or range changes
   useEffect(() => {
-  axios.get('http://localhost:3000/order/getOrders')
-    .then(response => {
-      const orders = response.data;
+    axios.get('http://localhost:3000/order/getOrders')
+      .then(response => {
+        const orders = response.data;
 
-      // Filter orders by selected date (full day)
-      const filtered = orders.filter(order =>
-        order.createdAt?.startsWith(date)
-      );
+        // Filter orders for selected local date
+        const filtered = orders.filter(order =>
+          toLocalDate(order.createdAt) === date
+        );
 
-      setOrderQty(filtered.length);
-      setGuestQty(filtered.reduce((sum, order) => sum + (Number(order.guest) || 0), 0));
-      setPrice(filtered.reduce((sum, order) => sum + (order.paymentStatus === 'Paid' ? Number(order.amount) : 0), 0));
+        setOrderQty(filtered.length);
+        setGuestQty(filtered.reduce((sum, order) => sum + (Number(order.guest) || 0), 0));
+        setPrice(filtered.reduce((sum, order) => sum + (order.paymentStatus === 'Paid' ? Number(order.amount) : 0), 0));
 
-      // Filter orders by date range (startDate to endDate)
-      const filteredByRange = orders.filter(order => {
-        const orderDate = order.createdAt?.split('T')[0];
-        return orderDate >= startDate && orderDate <= endDate;
-      });
+        // Filter orders by range
+        const filteredByRange = orders.filter(order => {
+          const localDate = toLocalDate(order.createdAt);
+          return localDate >= startDate && localDate <= endDate;
+        });
 
-      // Group amounts and guests by date string
-      const groupedAmounts = {};
-      const groupedGuests = {};
+        const groupedAmounts = {};
+        const groupedGuests = {};
 
-      filteredByRange.forEach(order => {
-        const orderDate = order.createdAt?.split('T')[0];
-        if (!groupedAmounts[orderDate]) groupedAmounts[orderDate] = 0;
-        if (!groupedGuests[orderDate]) groupedGuests[orderDate] = 0;
+        filteredByRange.forEach(order => {
+          const localDate = toLocalDate(order.createdAt);
+          groupedAmounts[localDate] = (groupedAmounts[localDate] || 0) + (order.paymentStatus === 'Paid' ? Number(order.amount) : 0);
+          groupedGuests[localDate] = (groupedGuests[localDate] || 0) + (Number(order.guest) || 0);
+        });
 
-        groupedAmounts[orderDate] += order.paymentStatus === 'Paid' ? Number(order.amount) : 0;
-        groupedGuests[orderDate] += Number(order.guest) || 0;
-      });
+        const sortedDates = Object.keys(groupedAmounts).sort();
+        setLabels(sortedDates);
+        setDataPointsIncome(sortedDates.map(d => groupedAmounts[d]));
+        setDataPointGuest(sortedDates.map(d => groupedGuests[d]));
+      })
+      .catch(err => console.error('Failed to fetch orders:', err));
 
-      // Sort dates
-      const sortedDates = Object.keys(groupedAmounts).sort();
+    axios.get('http://localhost:3000/orderItem/getOrderItems')
+      .then(response => {
+        const filtered = response.data.filter(item =>
+          toLocalDate(item.createdAt) === date
+        );
 
-      // Prepare data arrays for charts
-      const incomeData = sortedDates.map(date => groupedAmounts[date]);
-      const guestData = sortedDates.map(date => groupedGuests[date]);
+        const aggregated = {};
+        filtered.forEach(({ item, quantity }) => {
+          if (aggregated[item.id]) {
+            aggregated[item.id].quantity += quantity;
+          } else {
+            aggregated[item.id] = { id: item.id, name: item.name, quantity };
+          }
+        });
 
-      setLabels(sortedDates);
-      setDataPointsIncome(incomeData);
-      setDataPointGuest(guestData);
-    })
-    .catch(err => console.error('Failed to fetch orders:', err));
+        const top8 = Object.values(aggregated)
+          .sort((a, b) => b.quantity - a.quantity)
+          .slice(0, 8);
 
-  axios.get('http://localhost:3000/orderItem/getOrderItems')
-    .then(response => {
-      const filtered = response.data.filter(item =>
-        item.createdAt?.startsWith(date)
-      );
-
-      const aggregated = {};
-      filtered.forEach(({ item, quantity }) => {
-        if (aggregated[item.id]) {
-          aggregated[item.id].quantity += quantity;
-        } else {
-          aggregated[item.id] = { id: item.id, name: item.name, quantity };
-        }
-      });
-
-      const top8 = Object.values(aggregated)
-        .sort((a, b) => b.quantity - a.quantity)
-        .slice(0, 8);
-
-      setOrderItem(top8);
-      setItemQty(filtered.reduce((sum, item) => sum + (item.quantity || 0), 0));
-    })
-    .catch(err => console.error('Failed to fetch items:', err));
-}, [date, startDate, endDate]);
-
+        setOrderItem(top8);
+        setItemQty(filtered.reduce((sum, item) => sum + (item.quantity || 0), 0));
+      })
+      .catch(err => console.error('Failed to fetch items:', err));
+  }, [date, startDate, endDate]);
 
   return (
     <div className="container-fluid p-0">
       <div className="row p-0 m-3">
-        {/* Left panel */}
+        {/* Left Panel */}
         <div className="col-8 rounded bg-warning p-3">
           <div className="row d-flex justify-content-between align-items-center mb-3">
             <div className="col-8">
@@ -133,7 +114,6 @@ function Dashboard() {
                 type="date"
                 className="form-control"
                 id="selectedDate"
-                name="selectedDate"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
               />
@@ -164,14 +144,13 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Right panel */}
+        {/* Right Panel */}
         <div className="col-4 p-3 rounded bg-dark">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <input
               type="date"
               className="form-control"
               id="startDate"
-              name="startDate"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
             />
@@ -180,13 +159,12 @@ function Dashboard() {
               type="date"
               className="form-control"
               id="endDate"
-              name="endDate"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
             />
           </div>
           <Income labels={labels} dataPoints={dataPointsIncome} />
-          <GuestPerWeek labels={labels} dataPoints={dataPointsGuest} />
+          <GuestGraph labels={labels} dataPoints={dataPointsGuest} />
         </div>
       </div>
     </div>

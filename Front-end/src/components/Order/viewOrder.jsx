@@ -1,7 +1,7 @@
 import { orders } from "../../assets/Database.jsx";
 import { useState, useEffect } from "react";
 
-const ViewOrder = ({ordered, totalPrice}) => {
+const ViewOrder = ({ ordered, totalPrice }) => {
     return (
         <div className="container p-0">
             <div className="card text-light rounded-3 shadow-sm p-3 border-0" style={{ backgroundColor: '#343a40' }}>
@@ -21,14 +21,27 @@ const ViewOrder = ({ordered, totalPrice}) => {
                     </div>
 
                     {/* Status */}
-                    <div className="text-end">
-                        <div className={`badge mb-1 ${ordered.status === 'Ready' ? 'bg-success' : 'bg-warning'}`}>
-                            {ordered.status === 'Ready' ? (
+                    <div className="d-flex flex-column align-items-between">
+                        <div className={`badge mb-1 ${ordered.status === 'In Progress' ? 'bg-warning' : ordered.status === 'Ready' ? 'bg-primary' : 'bg-success'}`}
+                        >
+                            {ordered.status === 'In Progress' ? (
+                                <i className="fa-solid fa-hourglass-start me-1"></i>
+                            ) : ordered.status === 'Ready' ? (
+                                <i className="fa-solid fa-check me-1"></i>
+                            ) : (
+                                <i className="fa-solid fa-check-double me-1"></i>
+                            )}
+                            {ordered.status}
+                        </div>
+                        <div
+                            className={`badge mb-1 ${ordered.paymentStatus === 'Paid' ? 'bg-success' : 'bg-danger'}`}
+                        >
+                            {ordered.paymentStatus === 'Paid' ? (
                                 <i className="fa-solid fa-check-double me-1"></i>
                             ) : (
                                 <i className="fa-solid fa-hourglass-start me-1"></i>
                             )}
-                            {ordered.status}
+                            {ordered.paymentStatus}
                         </div>
                     </div>
                 </div>

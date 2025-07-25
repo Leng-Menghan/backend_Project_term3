@@ -100,3 +100,6 @@ button:focus-visible {
   display: none;
 }
 
+tr{
+  text-align: center;
+}

@@ -3,17 +3,28 @@ import ShowOrders from './showOrder.jsx';
 import OrderTable from '../AllOrder/OrderTable.jsx';
 import axios from "axios";
 import { useState, useEffect } from "react";
+function toLocalDate(dateInput) {
+  const date = new Date(dateInput);
+  return date.toLocaleDateString('en-CA');
+}
 const OrderLayout = () => {
   const [orders, setOrders] = useState([]);
+
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0]; // e.g. '2025-07-23'
+    const today = toLocalDate(new Date());
     axios.get('http://localhost:3000/order/getOrders')
       .then(response => {
-        setOrders(
-          response.data.filter(order => order.createdAt?.startsWith(today)) || []
-        );
+        const filtered = response.data.filter(order => {
+          const orderDate = toLocalDate(order.createdAt);
+          return orderDate === today;
+        }
+        ) || [];
+        // Sort descending by createdAt
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setOrders(filtered);
       })
   }, []);
+
 
   return (
     <>
@@ -52,7 +63,8 @@ const OrderLayout = () => {
                 ordered={orders}
                 onDelete={id => setOrders(orders.filter(order => order.id !== id))}
                 onStatusChange={(id, newStatus) => setOrders(orders.map(order => order.id === id ? { ...order, status: newStatus } : order))}
-                onPaymentStatusChange={(id, newStatus) => setOrders(orders.map(order => order.id === id ? { ...order, paymentStatus: newStatus } : order))} />} />
+                onPaymentStatusChange={(id, newStatus) => setOrders(orders.map(order => order.id === id ? { ...order, paymentStatus: newStatus } : order))}
+              />} />
               <Route path="/inProgress" element={<ShowOrders
                 ordered={orders.filter(order => order.status === 'In Progress')}
                 onDelete={id => setOrders(orders.filter(order => order.id !== id))}
@@ -71,6 +83,8 @@ const OrderLayout = () => {
             </Routes>
           </div>
         </div>
+
+
         {/* <div className="p-3">
           <OrderTable/>
         </div> */}

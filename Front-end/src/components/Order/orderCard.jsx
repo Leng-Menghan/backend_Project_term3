@@ -78,9 +78,13 @@ const OrderCard = ({ order, onDelete, onStatusChange, onPaymentStatusChange }) =
             )}
             {order.status}
           </div>
-          {/* payment status */}
-          <div className={`badge mb-1 ${order.paymentStatus === 'Paid' ? 'bg-success' : 'bg-danger'}`}
-            onClick={() => handlePaymentStatusChange(order.id, order.paymentStatus === 'Paid' ? 'Unpaid' : 'Paid')}
+          <div
+            className={`badge mb-1 ${order.paymentStatus === 'Paid' ? 'bg-success' : 'bg-danger'}`}
+            onClick={() => {
+              if (order.paymentStatus !== 'Paid') {
+                handlePaymentStatusChange(order.id, 'Paid');
+              }
+            }}
             style={{ cursor: 'pointer' }}
           >
             {order.paymentStatus === 'Paid' ? (
@@ -90,6 +94,7 @@ const OrderCard = ({ order, onDelete, onStatusChange, onPaymentStatusChange }) =
             )}
             {order.paymentStatus}
           </div>
+
         </div>
       </div>
 
@@ -121,14 +126,24 @@ const OrderCard = ({ order, onDelete, onStatusChange, onPaymentStatusChange }) =
         <button type="button" className="btn btn-outline-primary btn-sm " data-bs-toggle="modal" data-bs-target={`#orderModal${order.id}`}>
           View
         </button>
-        <Link to={`updateOrder/${order.id}`}>
-          <button type="button" className="btn btn-outline-warning btn-sm">
-            Edit
-          </button>
-        </Link>
-        <button type="button" className="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target={`#deleteModal${order.id}`}>
-          Delete
-        </button>
+        {(order.status !== 'Completed' && order.status !== 'Ready') && (
+          <>
+            <Link to={`updateOrder/${order.id}`}>
+              <button type="button" className="btn btn-outline-warning btn-sm">
+                Edit
+              </button>
+            </Link>
+            <button
+              type="button"
+              className="btn btn-outline-danger btn-sm"
+              data-bs-toggle="modal"
+              data-bs-target={`#deleteModal${order.id}`}
+            >
+              Delete
+            </button>
+          </>
+        )}
+
       </div>
 
       {/* Modal View Order */}

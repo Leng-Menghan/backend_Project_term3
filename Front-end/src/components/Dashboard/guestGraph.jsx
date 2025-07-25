@@ -3,7 +3,7 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-function guestPerWeek({labels, dataPoints}) {
+function GuestGraph({labels, dataPoints}) {
   const data = {
     labels: labels,
     datasets: [
@@ -27,11 +27,11 @@ function guestPerWeek({labels, dataPoints}) {
     responsive: true,
     plugins: {
       legend: { display : false, position: 'top' },
-      title: { display: true, text: 'Number of guest per week' },
+      title: { display: true, text: 'Number of guest graph Bar' },
     },
   };
 
   return <Bar data={data} options={options} className='bg-white p-2 rounded w-100'/>;
 }
 
-export default guestPerWeek;
+export default GuestGraph;

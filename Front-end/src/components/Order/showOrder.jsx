@@ -1,6 +1,6 @@
 import OrderCard from "./orderCard.jsx";
 
-const ShowOrders = ({ ordered, onDelete, onStatusChange, onPaymentStatusChange }) => {
+const ShowOrders = ({ ordered, onDelete, onStatusChange, onPaymentStatusChange}) => {
   return (
     <div className="row g-4">
       {ordered.map(order => (

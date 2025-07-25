@@ -9,10 +9,14 @@ import { useParams } from 'react-router-dom';
 const handleBack = () => {
     window.history.back();
 }
-
+function toLocalDate(dateInput) {
+  const date = new Date(dateInput);
+  return date.toLocaleDateString('en-CA');
+}
 const UpdateOrder = () => {
     const navigate = useNavigate();
     const { id } = useParams();
+    const Today = toLocalDate(new Date());
 
     const [orderedItems, setOrderedItems] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState([]);
@@ -25,6 +29,7 @@ const UpdateOrder = () => {
 // For get
     const [tables, setTables] = useState([]);
     const [menus, setMenus] = useState([]);
+        const [tableSeats, setTableSeats] = useState([]);
     const [items, setItems] = useState([]);
     const handleUpdateOrder = async () => {
         const data = {
@@ -66,6 +71,25 @@ const UpdateOrder = () => {
             .then(response => {
             setItems(response.data);
         })
+        axios.get('http://localhost:3000/order/getOrders')
+            .then(response => {
+                const filtered = response.data.filter(order =>
+                     {
+                        const orderDate = toLocalDate(order.createdAt);
+                        return orderDate === Today && (order.status === "In Progress" || order.status === "Ready")
+                     }
+                );
+                const aggregated = {};
+                filtered.forEach(({ tableId, guest }) => {
+                    if (aggregated[tableId]) {
+                        aggregated[tableId].guest += guest;
+                    } else {
+                        aggregated[tableId] = { tableId: tableId, guest: guest };
+                    }
+                });
+                const result = Object.values(aggregated);
+                setTableSeats(result);
+            })
     }, []);
     const handleAddToOrder = (item) => {
         const exists = orderedItems.find(order => order.id === item.id);
@@ -89,11 +113,22 @@ const UpdateOrder = () => {
                     <div className="mx-3 d-flex align-items-center" style={{ width: '300px' }}>
                         <select className="form-select" onChange={(e) => setTableId(e.target.value)} value={tableId}>
                             <option selected disabled hidden>Select Table</option>
-                            {tables.map((table) => (
-                                <option key={table.id} value={table.id} className={table.status === 'Available' ? 'text-success' : 'text-warning'}>
-                                    {table.name} - Available seat: {table.seat}
-                                </option>
-                            ))}
+                            {tables.map((table) => {
+                                const guest = tableSeats.find(t => t.tableId === table.id)?.guest || 0;
+                                const availableSeat = table.seat - guest;
+                                if (availableSeat <= 0) {
+                                    return null;
+                                }
+                                return (
+                                    <option
+                                        key={table.id}
+                                        value={table.id}
+                                        className="text-success"
+                                    >
+                                        {table.name} - Available seat: {availableSeat}
+                                    </option>
+                                );
+                            })}
                         </select>
                     </div>
                     <div className="mx-3 d-flex align-items-center">

@@ -75,6 +75,7 @@ export async function updateTableStatus(tableId, status) {
     const table = await Table.findByPk(tableId);
     if (!table) throw new Error("Table not found");
     await table.update({ status });
+    return table;
 }
 export async function getTables() {
     const tables = await Table.findAll();
