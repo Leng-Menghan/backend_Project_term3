@@ -5,23 +5,29 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 import ViewOrder from '../Order/viewOrder';
 const OrderTable = () => {
+      const token = localStorage.getItem('token');
+      const header = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
     const [tables, setTables] = useState([]);
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
 
     // Fetch orders only once
     useEffect(() => {
-        axios.get('http://localhost:3000/order/getOrders').then((response) => {
+        axios.get('http://localhost:3000/order/getOrders', header).then((response) => {
             setOrders(response.data);
             setFilteredOrders(response.data); // Set both at the same time
         });
-        axios.get('http://localhost:3000/table/getTables').then((response) => {
+        axios.get('http://localhost:3000/table/getTables', header).then((response) => {
             setTables(response.data);
         });
     }, []);
 
     const handleStatusChange = (orderId, newStatus) => {
-        axios.put(`http://localhost:3000/order/updateStatus/${orderId}`, { status: newStatus })
+        axios.put(`http://localhost:3000/order/updateStatus/${orderId}`, { status: newStatus }, header)
             .then(() => {
                 const updated = orders.map((order) => {
                     if (order.id === orderId) {
@@ -37,7 +43,7 @@ const OrderTable = () => {
             });
     }
     const handlePaymentStatusChange = (orderId, newStatus) => {
-        axios.put(`http://localhost:3000/order/updatePaymentStatus/${orderId}`, { paymentStatus: newStatus })
+        axios.put(`http://localhost:3000/order/updatePaymentStatus/${orderId}`, { paymentStatus: newStatus }, header)
             .then(() => {
                 const updated = orders.map((order) => {
                     if (order.id === orderId) {
@@ -63,7 +69,7 @@ const OrderTable = () => {
             confirmButtonText: 'Yes, delete it!',
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.delete(`http://localhost:3000/order/${id}`).then(() => {
+                axios.delete(`http://localhost:3000/order/${id}`, header).then(() => {
                     const updated = orders.filter((order) => order.id !== id);
                     setOrders(updated);
                     setFilteredOrders(updated);

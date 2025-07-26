@@ -3,6 +3,71 @@ import Item from "../models/item.js";
 import Menu from "../models/menu.js";
 import Table from "../models/table.js";
 import orderItem from "../models/orderItem.js";
+import User from "../models/user.js";
+
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
+
+export async function getUsers() {
+    const users = await User.findAll();
+    return users;
+}
+
+export async function loginUser(email, password) {
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+        throw new Error('User not found');
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+        throw new Error('Invalid credentials');
+    }
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role, name: user.name }, process.env.JWT_SECRET, {
+        expiresIn: '1h',
+    });
+    return { token, user };
+}
+
+export async function createUser(name, gender, DOB, address, phoneNumber, email, password, role) {
+    const existingUser = await User.findOne({ where: { email: email } });
+    if (existingUser) {
+        throw new Error('Email already registered');
+    }
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const user = await User.create({
+        name: name,
+        gender: gender,
+        DOB: DOB,
+        address: address,
+        phoneNumber: phoneNumber,
+        email: email,
+        password: hashedPassword,
+        role: role
+    });
+    return user;
+}
+
+export async function getUser(id) {
+    const user = await User.findByPk(id);
+    return user;
+}
+
+export async function updateUser(id, name, gender, DOB, address, phoneNumber, email, password, role) {
+    const user = await User.findByPk(id);
+    await user.update({ name, gender, DOB, address, phoneNumber, email, password, role });
+    return user;
+}
+
+export async function deleteUser(id) {
+    const user = await User.findByPk(id);
+    await user.destroy();
+    return user;
+}
+
 // Orders
 export async function createOrder(status, guest, tableId, items, amount, paymentStatus) {
     const order = await Order.create({ status, guest, tableId, amount, paymentStatus });
@@ -41,7 +106,7 @@ export async function getOrders() {
 export async function updateOrder(guest, tableId, items, orderId, amount, paymentStatus) {
     const order = await Order.findByPk(orderId);
     if (!order) throw new Error("Order not found");
-    await order.update({guest, tableId , amount, paymentStatus});
+    await order.update({ guest, tableId, amount, paymentStatus });
     await order.setItems([]);
     for (const { id, quantity } of items) {
         await order.addItem(id, { through: { quantity } });

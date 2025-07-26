@@ -14,6 +14,12 @@ function toLocalDate(dateInput) {
   return date.toLocaleDateString('en-CA');
 }
 const UpdateOrder = () => {
+      const token = localStorage.getItem('token');
+      const header = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
     const navigate = useNavigate();
     const { id } = useParams();
     const Today = toLocalDate(new Date());
@@ -40,7 +46,7 @@ const UpdateOrder = () => {
             paymentStatus: paymentStatus
         };
         try {
-            const response = await axios.put(`http://localhost:3000/order/${id}`, data);
+            const response = await axios.put(`http://localhost:3000/order/${id}`, data, header);
             console.log('Order created:', response.data);
             navigate('/order');
             // Optional: reset form or navigate
@@ -49,7 +55,7 @@ const UpdateOrder = () => {
         }
     };
     useEffect(() => {
-        axios.get(`http://localhost:3000/order/${id}`)
+        axios.get(`http://localhost:3000/order/${id}`, header)
             .then(response => {
             setOrderedItems(
                 response.data.items.map(item => ({...item,quantity: item.orderItem.quantity }))
@@ -59,19 +65,19 @@ const UpdateOrder = () => {
             setAmount(response.data.amount);
             setPaymentStatus(response.data.paymentStatus);
         })
-        axios.get('http://localhost:3000/table/getTables')
+        axios.get('http://localhost:3000/table/getTables', header)
             .then(response => {
             setTables(response.data);
         })
-        axios.get('http://localhost:3000/menu/getMenus')
+        axios.get('http://localhost:3000/menu/getMenus', header)
             .then(response => {
             setMenus(response.data);
         })
-        axios.get('http://localhost:3000/item/getItems')
+        axios.get('http://localhost:3000/item/getItems', header)
             .then(response => {
             setItems(response.data);
         })
-        axios.get('http://localhost:3000/order/getOrders')
+        axios.get('http://localhost:3000/order/getOrders', header)
             .then(response => {
                 const filtered = response.data.filter(order =>
                      {

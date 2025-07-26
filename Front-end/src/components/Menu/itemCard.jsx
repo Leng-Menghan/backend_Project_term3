@@ -1,23 +1,45 @@
 import axios from "axios";
+import Swal from 'sweetalert2';
 import { useState, useEffect } from "react";
-const itemCard = ({item, onDelete}) => {
+import { useAuth } from "../../context/authContext";
+const itemCard = ({ item, onDelete }) => {
+    const { auth } = useAuth();
+    const token = localStorage.getItem('token');
+    const header = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    }
     const [curItem, setCurItem] = useState(item);
     const [name, setName] = useState(item.name);
     const [price, setPrice] = useState(item.price);
-    const handleEditItem = (event) => { 
+    const handleEditItem = (event) => {
         const data = {
             name: name,
             price: price,
         }
-        axios.put('http://localhost:3000/item/' + curItem.id, data).then((response) => {
+        axios.put('http://localhost:3000/item/' + curItem.id, data, header).then((response) => {
             setCurItem(response.data);
         })
     };
     const handleDeleteItem = () => {
-        axios.delete('http://localhost:3000/item/' + curItem.id).then((response) => {
-            onDelete(curItem.id);
-        })
-    }
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.delete('http://localhost:3000/item/' + curItem.id, header).then((response) => {
+                    onDelete(curItem.id);
+                })
+                Swal.fire('Deleted!', 'Your menu has been deleted.', 'success');
+            }
+        });
+    };
     return (
         <>
             <div
@@ -31,18 +53,22 @@ const itemCard = ({item, onDelete}) => {
                     <div className="d-flex justify-content-between gap-2 mt-3 w-100">
                         <div className="text-warning fw-semibold"> $ {curItem.price}</div>
                         <div>
-                            <button type="button" className="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target={`#editItemModal${curItem.id}`}>
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <button type="button" className="btn btn-outline-danger btn-sm ms-2" data-bs-toggle="modal" data-bs-target={`#deleteItemModal${curItem.id}`}>
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
+                            {auth.role === 'Admin' && (
+                                <>
+                                    <button type="button" className="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target={`#editItemModal${curItem.id}`}>
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button type="button" className="btn btn-outline-danger btn-sm ms-2" onClick={() => handleDeleteItem()}>
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
-            
+
             {/* Modal edit item */}
             <div
                 className="modal fade"
@@ -99,35 +125,6 @@ const itemCard = ({item, onDelete}) => {
                         <div className="modal-footer">
                             <button type="button" className="btn btn-success" data-bs-dismiss="modal" onClick={handleEditItem}>
                                 Update
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Modal delete item */}
-            <div
-                className="modal fade"
-                id={`deleteItemModal${curItem.id}`}
-                data-bs-backdrop="static"
-                data-bs-keyboard="false"
-                tabIndex="-1"
-                aria-labelledby={`deleteItemModalLabel${curItem.id}`}
-                aria-hidden="true"
-            >
-                <div className="modal-dialog">
-                    <div className="modal-content bg-dark">
-                        <div className="modal-body">
-                            <p className="text-white">
-                                Are you sure you want to delete Item {curItem.name}?
-                            </p>
-                        </div>
-                        <div className="modal-footer">
-                            <button type="button" className="btn btn-danger" data-bs-dismiss="modal">
-                                Cancel
-                            </button>
-                            <button type="button" className="btn btn-primary" data-bs-dismiss="modal" onClick={handleDeleteItem}>
-                                Confirm
                             </button>
                         </div>
                     </div>

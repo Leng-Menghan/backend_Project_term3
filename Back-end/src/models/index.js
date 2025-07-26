@@ -3,6 +3,7 @@ import Order from "./order.js";
 import Table from "./table.js";
 import Menu from "./menu.js";
 import orderItem from "./orderItem.js";
+import User from "./user.js";
 // Menu and Item
 Menu.hasMany(Item);
 Item.belongsTo(Menu);

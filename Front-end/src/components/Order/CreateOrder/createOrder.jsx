@@ -14,6 +14,12 @@ function toLocalDate(dateInput) {
   return date.toLocaleDateString('en-CA');
 }
 const CreateOrder = () => {
+      const token = localStorage.getItem('token');
+      const header = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
     const navigate = useNavigate();
     const Today = toLocalDate(new Date());
 
@@ -33,19 +39,19 @@ const CreateOrder = () => {
 
     // Fetch initial data
     useEffect(() => {
-        axios.get('http://localhost:3000/table/getTables')
+        axios.get('http://localhost:3000/table/getTables', header)
             .then(response => setTables(response.data))
             .catch(console.error);
 
-        axios.get('http://localhost:3000/menu/getMenus')
+        axios.get('http://localhost:3000/menu/getMenus', header)
             .then(response => setMenus(response.data))
             .catch(console.error);
 
-        axios.get('http://localhost:3000/item/getItems')
+        axios.get('http://localhost:3000/item/getItems', header)
             .then(response => setItems(response.data))
             .catch(console.error);
 
-        axios.get('http://localhost:3000/order/getOrders')
+        axios.get('http://localhost:3000/order/getOrders', header)
             .then(response => {
                 const filtered = response.data.filter(order =>
                      {
@@ -101,7 +107,7 @@ const CreateOrder = () => {
             return;
         }
         try {
-            await axios.post('http://localhost:3000/order/create', data);
+            await axios.post('http://localhost:3000/order/create', data, header);
             navigate('/Order');
         } catch (error) {
             console.error('Create order error:', error);

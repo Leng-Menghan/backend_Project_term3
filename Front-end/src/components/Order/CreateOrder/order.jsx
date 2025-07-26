@@ -36,7 +36,7 @@ const Order = ({item, itemStatus, onDelete}) => {
                     <button className="btn btn-sm btn-outline-danger" onClick={handleDelete}><i class="fa-solid fa-trash-can"></i></button>
                 </div>
                 <div className="d-flex justify-content-between">
-                    <div className="d-flex align-items-center justify-content-center">{totalPrice} $</div>
+                    <div className="d-flex align-items-center justify-content-center">{totalPrice.toFixed(2)} $</div>
                     <div className="qty bg-dark d-flex rounded">
                         <button className="btn btn-sm text-warning" style={{ width: '40px' }} onClick={minus}><i class="fa-solid fa-minus"></i></button>
                         <div className=" d-flex align-items-center justify-content-center" style={{ minWidth: '40px' }}>

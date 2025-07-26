@@ -15,6 +15,12 @@ function toLocalDate(dateInput) {
 }
 
 function Dashboard() {
+    const token = localStorage.getItem('token');
+    const header = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
   const today = toLocalDate(new Date());
 
   // Get first and last day of current month
@@ -39,7 +45,7 @@ function Dashboard() {
   const [endDate, setEndDate] = useState(end);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/order/getOrders')
+    axios.get('http://localhost:3000/order/getOrders', header)
       .then(response => {
         const orders = response.data;
 
@@ -74,7 +80,7 @@ function Dashboard() {
       })
       .catch(err => console.error('Failed to fetch orders:', err));
 
-    axios.get('http://localhost:3000/orderItem/getOrderItems')
+    axios.get('http://localhost:3000/orderItem/getOrderItems', header)
       .then(response => {
         const filtered = response.data.filter(item =>
           toLocalDate(item.createdAt) === date
@@ -103,7 +109,7 @@ function Dashboard() {
     <div className="container-fluid p-0">
       <div className="row p-0 m-3">
         {/* Left Panel */}
-        <div className="col-8 rounded bg-warning p-3">
+        <div className="col-8 rounded  p-3">
           <div className="row d-flex justify-content-between align-items-center mb-3">
             <div className="col-8">
               <h3 className="fw-bold">Dashboard</h3>

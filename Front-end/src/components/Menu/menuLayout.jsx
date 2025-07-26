@@ -1,12 +1,20 @@
 import MenuCard from "./menuCard.jsx";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../../context/authContext.jsx";
 const Menu = () => {
+    const { auth } = useAuth();
+    const token = localStorage.getItem('token');
+    const header = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    }
     const [menus, setMenus] = useState([]);
     const [category, setCategory] = useState('');
     const [icon, setIcon] = useState('');
     useEffect(() => {
-        axios.get('http://localhost:3000/menu/getMenus').then((response) => {
+        axios.get('http://localhost:3000/menu/getMenus', header).then((response) => {
             setMenus(response.data);
         });
     }, []);
@@ -16,7 +24,7 @@ const Menu = () => {
             category: category,
             icon: icon
         };
-        axios.post('http://localhost:3000/menu/create', data).then((response) => {
+        axios.post('http://localhost:3000/menu/create', data, header).then((response) => {
             setMenus([...menus, response.data]);
         });
         setCategory('');
@@ -25,11 +33,15 @@ const Menu = () => {
     return (
         <>
             <div className="px-3">
-                <div className="p-3">
-                    <button type="button" className="btn btn-outline-primary " data-bs-toggle="modal" data-bs-target={`#createMenuModal`}>
-                        <i className="fa-solid fa-square-plus"></i> Create Menu
-                    </button>
-                </div>
+                {auth?.role === 'Admin' &&
+                    <>
+                        <div className="p-3">
+                            <button type="button" className="btn btn-outline-primary " data-bs-toggle="modal" data-bs-target={`#createMenuModal`}>
+                                <i className="fa-solid fa-square-plus"></i> Create Menu
+                            </button>
+                        </div>
+                    </>
+                }
                 <div className="container-fluid d-flex flex-column p-0">
                     <div className="flex-grow-1 m-0 bg-gray-100 p-3">
                         <div className="row g-3">
@@ -38,7 +50,7 @@ const Menu = () => {
                                     key={menu.id}
                                     className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-12 d-flex justify-content-center"
                                 >
-                                    <MenuCard menu={menu} onDelete={(id) => setMenus(menus.filter(menu => menu.id !== id))}/>
+                                    <MenuCard menu={menu} onDelete={(id) => setMenus(menus.filter(menu => menu.id !== id))} />
                                 </div>
                             ))}
                         </div>
