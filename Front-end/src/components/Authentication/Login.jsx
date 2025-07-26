@@ -3,15 +3,16 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { setToken } from "../../utils/auth";
 import { useAuth } from "../../context/authContext";
+import Swal from 'sweetalert2';
 const Login = () => {
   const { setAuth, auth } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     // implement your login logic here
-    e.preventDefault(); 
+    e.preventDefault();
     try {
       const res = await axios.post("http://localhost:3000/user/login", { email, password });
       if (res.data.token) {
@@ -19,10 +20,20 @@ const Login = () => {
         setAuth(res.data.user);
         navigate("/dashboard", { replace: true });
       } else {
-        setError("Login failed. Please check your credentials.");
+        Swal.fire({
+          icon: 'warning',
+          title: 'Login Failed',
+          text: 'Please check your email and password.',
+          confirmButtonText: 'OK'
+        });
       }
     } catch (err) {
-      setError("Login failed. Please try again.");
+      Swal.fire({
+          icon: 'warning',
+          title: 'Login Failed',
+          text: 'Please check your email and password.',
+          confirmButtonText: 'OK'
+        });
     }
   };
 

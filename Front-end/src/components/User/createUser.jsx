@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 const CreateUser = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -26,9 +27,20 @@ const CreateUser = () => {
         axios.post('http://localhost:3000/user/register', formData)
             .then((response) => {
                 navigate('/user');
+                Swal.fire({
+                    icon: 'success',
+                    title: response.data.message,
+                    text: 'User created successfully',
+                    confirmButtonText: 'OK'
+                });
             })
             .catch((error) => {
-                console.error("Error creating user:", error);
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Register Failed',
+                    text: error.response.data.error,
+                    confirmButtonText: 'OK'
+                });
             });
     };
 
@@ -50,20 +62,19 @@ const CreateUser = () => {
                             className="form-control"
                             placeholder="Enter name"
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required
                         />
                     </div>
 
                     <div className="input-group mb-3 d-flex">
                         <span className="input-group-text">Role</span>
                         <select className="form-select" onChange={(e) => setFormData({ ...formData, role: e.target.value })}>
-                            <option disabled selected>Open this select Role</option>
-                            <option value="Admin">Admin</option>
                             <option value="Staff">Staff</option>
+                            <option value="Admin">Admin</option>
                         </select>
 
                         <span className="input-group-text ms-3">Gender</span>
                         <select className="form-select" onChange={(e) => setFormData({ ...formData, gender: e.target.value })}>
-                            <option disabled selected>Open this select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
@@ -75,6 +86,7 @@ const CreateUser = () => {
                             type="text"
                             className="form-control"
                             placeholder="Enter address"
+                            required
                             onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                         />
                     </div>
@@ -85,6 +97,7 @@ const CreateUser = () => {
                             type="text"
                             className="form-control"
                             placeholder="Enter phone number"
+                            required
                             onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                         />
                     </div>
@@ -94,6 +107,7 @@ const CreateUser = () => {
                         <input
                             type="date"
                             className="form-control"
+                            required
                             onChange={(e) => setFormData({ ...formData, DOB: e.target.value })}
                         />
                     </div>
@@ -103,6 +117,7 @@ const CreateUser = () => {
                             type="text"
                             className="form-control"
                             placeholder="Email"
+                            required
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
                         <span className="input-group-text">@</span>
@@ -110,6 +125,7 @@ const CreateUser = () => {
                             type="password"
                             className="form-control"
                             placeholder="Password"
+                            required
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         />
                     </div>
