@@ -1,4 +1,4 @@
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, Route, Routes, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ShowTables from "./ShowTable.jsx";
 import CreateTable from "./CRUD_model/createTable.jsx";
@@ -6,6 +6,7 @@ import axios from "axios";
 import { useAuth } from "../../context/authContext.jsx";
 import Swal from "sweetalert2";
 const Table = () => {
+  const location = useLocation();
   const { auth } = useAuth();
   const token = localStorage.getItem("token");
   const header = {
@@ -16,13 +17,15 @@ const Table = () => {
   const [tables, setTables] = useState([]);
   const [name, setName] = useState("");
   const [seat, setSeat] = useState(0);
-
-  useEffect(() => {
-    axios.get("http://localhost:3000/table/getTables", header)
+  const fetchTables = async () => {
+    await axios.get("http://localhost:3000/table/getTables", header)
       .then((response) => {
         setTables(response.data);
       });
-  }, []);
+  }
+  useEffect(() => {
+    fetchTables();
+  }, [location.pathname]);
   const handleCreateTable = (event) => {
     event.preventDefault();
     const data = {
@@ -64,7 +67,7 @@ const Table = () => {
             </button>
           </Link>
           <Link to="/table/occupied">
-            <button type="button" className="btn btn-outline-warning me-2">
+            <button type="button" className="btn btn-outline-danger me-2">
               <i className="fa-solid fa-hourglass-start"></i> Occupied
             </button>
           </Link>
@@ -81,8 +84,15 @@ const Table = () => {
                 tables={tables}
                 onDelete={(id) => { setTables(tables.filter((table) => table.id !== id)) }}
                 onEdit={(table) => { setTables(tables.map((t) => t.id === table.id ? table : t)) }} />} />
-              <Route path="available" element={<ShowTables tables={tables.filter((table) => table.status === "Available")} />} />
-              <Route path="occupied" element={<ShowTables tables={tables.filter((table) => table.status === "Occupied")} />} />
+              <Route path="available" element={<ShowTables 
+                tables={tables.filter((table) => table.status === "Available")} 
+                onDelete={(id) => { setTables(tables.filter((table) => table.id !== id)) }}
+                onEdit={(table) => { setTables(tables.map((t) => t.id === table.id ? table : t)) }}
+                />} />
+              <Route path="occupied" element={<ShowTables 
+                tables={tables.filter((table) => table.status === "Occupied")} 
+                onDelete={(id) => { setTables(tables.filter((table) => table.id !== id)) }}
+                onEdit={(table) => { setTables(tables.map((t) => t.id === table.id ? table : t)) }}/>} />
             </Routes>
           </div>
         </div>
