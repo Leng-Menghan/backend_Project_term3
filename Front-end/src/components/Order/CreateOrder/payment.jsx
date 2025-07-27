@@ -39,10 +39,10 @@ const payment = ({ ordered, onDelete, sendItemsList, amount, paymentStatus, isUp
                     </div>
                 ))}
             </div>
-            <div className="d-flex justify-content-between align-items-center mt-4">
+            <div className="d-flex flex-column justify-content-between align-items-center mt-4">
                 <h4 className="me-auto">Total: {grandTotal.toFixed(2)} $</h4>
                 {!isUpdate && (
-                    <select className="form-select" style={{ width: '160px' }} onChange={(e) => paymentStatus(e.target.value)}>
+                    <select className="form-select align-self-end" style={{ width: '120px' }} onChange={(e) => paymentStatus(e.target.value)}>
                     <option value="Unpaid">
                         Unpaid
                     </option>

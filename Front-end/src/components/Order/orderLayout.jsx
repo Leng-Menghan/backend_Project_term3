@@ -9,7 +9,7 @@ function toLocalDate(dateInput) {
   return date.toLocaleDateString('en-CA');
 }
 const OrderLayout = () => {
-    const { auth } = useAuth();
+  const { auth } = useAuth();
   const token = localStorage.getItem('token');
   const header = {
     headers: {
@@ -41,8 +41,11 @@ const OrderLayout = () => {
           (
             <>
               <div className="p-3">
-                <OrderTable />
+                <div className="table-responsive">
+                  <OrderTable />
+                </div>
               </div>
+
             </>
           )
           :

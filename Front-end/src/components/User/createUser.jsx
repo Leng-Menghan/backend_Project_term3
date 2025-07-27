@@ -68,17 +68,30 @@ const CreateUser = () => {
 
                     <div className="input-group mb-3 d-flex">
                         <span className="input-group-text">Role</span>
-                        <select className="form-select" onChange={(e) => setFormData({ ...formData, role: e.target.value })}>
+                        <select
+                            className="form-select"
+                            value={formData.role}
+                            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                            required
+                        >
+                            <option value="" disabled>Select Role</option>
                             <option value="Staff">Staff</option>
                             <option value="Admin">Admin</option>
                         </select>
 
                         <span className="input-group-text ms-3">Gender</span>
-                        <select className="form-select" onChange={(e) => setFormData({ ...formData, gender: e.target.value })}>
+                        <select
+                            className="form-select"
+                            value={formData.gender}
+                            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                            required
+                        >
+                            <option value="" disabled>Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                         </select>
                     </div>
+
 
                     <div className="input-group mb-3">
                         <span className="input-group-text">Address</span>

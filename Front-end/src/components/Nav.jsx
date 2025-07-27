@@ -14,14 +14,15 @@ function Nav() {
     return (
         <nav className="navbar bg-black p-3">
             <div className="w-100 d-flex justify-content-between">
-                <a className="navbar-brand text-white">Cafe ☕</a>
-                <div className="d-flex rounded bg-white p-2" role="search" style={{ maxWidth: '600px', width: '100%' }}>
+                <a className="navbar-brand text-white" style={{ width: '100px' }}>Cafe ☕</a>
+
+                <div className="d-flex rounded bg-white p-2 me-3" >
                     <div className="run-container">
                         <h4 className="run-word m-0">Welcome to Cafe Order Management System </h4>
                     </div>
                 </div>
-                <div className="d-flex align-items-center">
-                    <div className="bg-white rounded d-flex align-items-center justify-content-center me-3 px-3" style={{ width: 'auto', height: '40px' }}>
+                <div className="d-flex align-items-center justify-content-end p-0">
+                    <div className="bg-white rounded d-flex align-items-center justify-content-center me-3 px-3" style={{ width: '150px', height: '40px' }}>
                         {auth?.name || ''}
                     </div>
                     <div className="bg-warning rounded d-flex align-items-center justify-content-center me-3 px-3" style={{ width: 'auto', height: '40px' }}>

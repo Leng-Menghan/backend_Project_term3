@@ -61,7 +61,7 @@ const UserTable = () => {
         },
         cells: {
             style: {
-                fontSize: '1rem',
+                fontSize: '0.8rem',
                 borderRight: '1px solid #ddd',
                 padding: '8px 12px',
                 whiteSpace: 'nowrap',

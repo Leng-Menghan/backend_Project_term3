@@ -1,6 +1,6 @@
 const Order = ({orderQty}) => {
     return (
-        <div className="card text-light rounded-3 shadow-sm p-3 border-0" style={{ backgroundColor: '#343a40' }}>
+        <div className="card text-light rounded-3 shadow-sm my-1 p-2 border-0" style={{ backgroundColor: '#343a40' }}>
                 <div className="d-flex">
                     <h5 className="mb-0 fw-bold ">🧾 Order</h5>
                 </div>

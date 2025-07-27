@@ -1,6 +1,6 @@
 const Item = ({itemQty}) => {
     return (
-        <div className="card text-light rounded-3 shadow-sm p-3 border-0" style={{ backgroundColor: '#343a40' }}>
+        <div className="card text-light rounded-3 shadow-sm p-2 border-0 my-1" style={{ backgroundColor: '#343a40' }}>
                 <div className="d-flex">
                     <h5 className="mb-0 fw-bold ">🔢 Item</h5>
                 </div>

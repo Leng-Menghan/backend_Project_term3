@@ -166,7 +166,7 @@ const CreateOrder = () => {
             {/* Content */}
             <div className="row mt-3 p-3">
                 {/* Left Sidebar (Order Summary) */}
-                <div className="col-3">
+                <div className="col-lg-3 col-md-4">
                     <Payment
                         ordered={orderedItems}
                         onDelete={(id) => setOrderedItems(prev => prev.filter(item => item.id !== id))}
@@ -180,7 +180,7 @@ const CreateOrder = () => {
                 </div>
 
                 {/* Right Content (Menu + Items) */}
-                <div className="col-9">
+                <div className="col-lg-9 col-md-8">
                     <div className="p-3 rounded" style={{ backgroundColor: '#212529' }}>
                         <div className="p-3 shadow-sm pt-0">
                             <div className="text-center">
@@ -190,7 +190,7 @@ const CreateOrder = () => {
                                 <div className="row g-3">
                                     {menus.map((menu, index) => (
                                         <div
-                                            className="col-3"
+                                            className="col-md-6 col-lg-4"
                                             key={index}
                                             onClick={() => setSelectedMenu(menu)}
                                         >
@@ -210,7 +210,7 @@ const CreateOrder = () => {
                                 <div className="row g-3">
                                     {filteredItems.map((item, index) => (
                                         <div
-                                            className="col-3"
+                                            className="col-lg-3 col-md-6"
                                             key={index}
                                             onClick={() => handleAddToOrder(item)}
                                         >

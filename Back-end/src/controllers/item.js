@@ -18,9 +18,13 @@ export async function getAllByMenuId(req, res) {
 }
 
 export async function create(req, res) {
-    const { name, price, menuId } = req.body;
-    const item = await createItem(name, price, menuId);
-    res.status(201).json(item);
+    try {
+        const { name, price, menuId } = req.body;
+        const item = await createItem(name, price, menuId);
+        res.status(201).json(item);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 }
 
 export async function update(req, res) {
@@ -29,7 +33,6 @@ export async function update(req, res) {
     const item = await updateItem(id, name, price, menuId);
     res.status(200).json(item);
 }
-
 export async function remove(req, res) {
     const { id } = req.params;
     const item = await deleteItem(id);

@@ -4,6 +4,7 @@ import ShowTables from "./ShowTable.jsx";
 import CreateTable from "./CRUD_model/createTable.jsx";
 import axios from "axios";
 import { useAuth } from "../../context/authContext.jsx";
+import Swal from "sweetalert2";
 const Table = () => {
   const { auth } = useAuth();
   const token = localStorage.getItem("token");
@@ -32,6 +33,14 @@ const Table = () => {
     axios.post("http://localhost:3000/table/create", data, header)
       .then((response) => {
         setTables([...tables, response.data]);
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Create Table Failed',
+          text: error.response.data.error,
+          confirmButtonText: 'OK'
+        });
       });
     setName("");
     setSeat(0);
@@ -40,7 +49,7 @@ const Table = () => {
     <>
       <div className="px-3">
         <div className="p-3">
-          {auth?.role === 'admin' &&
+          {auth?.role === 'Admin' &&
             (
               <>
                 <button type="button" className="btn btn-outline-primary " data-bs-toggle="modal" data-bs-target={`#createTableModal`}>
@@ -49,17 +58,17 @@ const Table = () => {
               </>
             )
           }
-          <Link to="/Table">
+          <Link to="/table">
             <button type="button" className={`btn me-2 btn-outline-primary ms-2`}>
               <i class="fa-solid fa-border-all"></i> All
             </button>
           </Link>
-          <Link to="/Table/Occupied">
+          <Link to="/table/occupied">
             <button type="button" className="btn btn-outline-warning me-2">
               <i className="fa-solid fa-hourglass-start"></i> Occupied
             </button>
           </Link>
-          <Link to="/Table/Available">
+          <Link to="/table/available">
             <button type="button" className="btn btn-outline-success me-2">
               <i className="fa-solid fa-check-double"></i> Available
             </button>
@@ -72,8 +81,8 @@ const Table = () => {
                 tables={tables}
                 onDelete={(id) => { setTables(tables.filter((table) => table.id !== id)) }}
                 onEdit={(table) => { setTables(tables.map((t) => t.id === table.id ? table : t)) }} />} />
-              <Route path="Available" element={<ShowTables tables={tables.filter((table) => table.status === "Available")} />} />
-              <Route path="Occupied" element={<ShowTables tables={tables.filter((table) => table.status === "Occupied")} />} />
+              <Route path="available" element={<ShowTables tables={tables.filter((table) => table.status === "Available")} />} />
+              <Route path="occupied" element={<ShowTables tables={tables.filter((table) => table.status === "Occupied")} />} />
             </Routes>
           </div>
         </div>

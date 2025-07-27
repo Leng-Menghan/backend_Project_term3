@@ -133,6 +133,10 @@ export async function updatePaymentStatus(orderId, paymentStatus) {
 
 // Tables
 export async function createTable(name, status, seat) {
+    const existingTable = await Table.findOne({ where: { name } });
+    if (existingTable) {
+        throw new Error('Table name already exists');
+    }
     const table = await Table.create({ name, status, seat });
     return table;
 }
@@ -164,6 +168,10 @@ export async function deleteTable(id) {
 }
 // Items
 export async function createItem(name, price, menuId) {
+    const existingItem = await Item.findOne({ where: { name } });
+    if (existingItem) {
+        throw new Error('Item name already exists');
+    }
     const item = await Item.create({ name, price, menuId });
     return item;
 }
@@ -196,6 +204,10 @@ export async function getItemsByMenuId(menuId) {
 
 // Menu
 export async function createMenu(category, icon) {
+    const existingMenu = await Menu.findOne({ where: { category } });
+    if (existingMenu) {
+        throw new Error('Menu category already exists');
+    }
     const menu = await Menu.create({ category, icon });
     return menu;
 }

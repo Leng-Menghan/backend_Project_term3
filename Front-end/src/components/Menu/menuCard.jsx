@@ -32,9 +32,18 @@ const MenuCard = ({ menu, onDelete }) => {
             price: price,
             menuId: curMenu.id
         }
-        axios.post('http://localhost:3000/item/create', data, header).then((response) => {
+        axios.post('http://localhost:3000/item/create', data, header)
+        .then((response) => {
             setItems([...items, response.data]);
         })
+        .catch((error) => {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Create Item Failed',
+                text: error.response.data.error,
+                confirmButtonText: 'OK'
+            });
+        });
         setName('');
         setPrice(0);
     }
@@ -44,7 +53,8 @@ const MenuCard = ({ menu, onDelete }) => {
             category: category,
             icon: icon
         }
-        axios.put('http://localhost:3000/menu/' + curMenu.id, data, header).then((response) => {
+        axios.put('http://localhost:3000/menu/' + curMenu.id, data, header)
+        .then((response) => {
             setCurMenu(response.data);
         })
     }
@@ -91,7 +101,7 @@ const MenuCard = ({ menu, onDelete }) => {
                 <hr className="my-2" style={{ height: '1px', backgroundColor: 'white', border: 'none' }} />
                 <div className="row">
                     {items.map((item) => (
-                        <div className="col-2">
+                        <div className="col-lg-3 col-md-3 my-2">
                             <ItemCard key={item.id} item={item} onDelete={(id) => setItems(items.filter((item) => item.id !== id))} />
                         </div>
                     ))}

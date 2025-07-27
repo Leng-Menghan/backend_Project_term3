@@ -109,19 +109,20 @@ function Dashboard() {
     <div className="container-fluid p-0">
       <div className="row p-0 m-3">
         {/* Left Panel */}
-        <div className="col-8 rounded  p-3">
+        <div className="col-lg-8 col-md-7 rounded p-0 pe-3">
           <div className="row d-flex justify-content-between align-items-center mb-3">
-            <div className="col-8">
+            <div className="col-lg-6 col-md-4">
               <h3 className="fw-bold">Dashboard</h3>
             </div>
-            <div className="col-4 d-flex align-items-center">
-              <label htmlFor="selectedDate" className="form-label me-2 mb-0 fw-bold w-50">Select Date</label>
+            <div className="col-lg-6 col-md-8 d-flex align-items-center justify-content-end">
+              <label htmlFor="selectedDate" className="form-label mb-0 fw-bold text-end me-2" style={{ width: '130px' }}>Select Date</label>
               <input
                 type="date"
                 className="form-control"
                 id="selectedDate"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
+                style={{ width: '150px' }}
               />
             </div>
           </div>
@@ -130,10 +131,10 @@ function Dashboard() {
             <h3>Overview</h3>
             <hr className="my-2 mb-3" style={{ height: '1px', backgroundColor: 'white', border: 'none' }} />
             <div className="row">
-              <div className="col-3"><Item itemQty={itemQty} /></div>
-              <div className="col-3"><Guest guestQty={guestQty} /></div>
-              <div className="col-3"><Order orderQty={orderQty} /></div>
-              <div className="col-3"><Price price={price} /></div>
+              <div className="col-lg-3 col-md-6"><Item itemQty={itemQty} /></div>
+              <div className="col-lg-3 col-md-6"><Guest guestQty={guestQty} /></div>
+              <div className="col-lg-3 col-md-6 "><Order orderQty={orderQty} /></div>
+              <div className="col-lg-3 col-md-6 "><Price price={price} /></div>
             </div>
           </div>
 
@@ -142,7 +143,7 @@ function Dashboard() {
             <hr className="my-2 mb-3" style={{ height: '1px', backgroundColor: 'white', border: 'none' }} />
             <div className="row">
               {orderItem.map(item => (
-                <div className="col-3" key={item.id}>
+                <div className="col-lg-3 col-md-6" key={item.id}>
                   <TopSell name={item.name} quantity={item.quantity} />
                 </div>
               ))}
@@ -151,7 +152,7 @@ function Dashboard() {
         </div>
 
         {/* Right Panel */}
-        <div className="col-4 p-3 rounded bg-dark">
+        <div className="col-lg-4 col-md-5 p-3 rounded bg-dark">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <input
               type="date"
@@ -159,6 +160,7 @@ function Dashboard() {
               id="startDate"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              style={{ width: '130px' }}
             />
             <span className="fw-bold me-2 ms-2 text-white">to</span>
             <input
@@ -167,6 +169,7 @@ function Dashboard() {
               id="endDate"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
+              style={{ width: '130px' }}
             />
           </div>
           <Income labels={labels} dataPoints={dataPointsIncome} />

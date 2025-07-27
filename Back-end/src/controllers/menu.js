@@ -12,14 +12,18 @@ export async function getAll(req, res) {
 }
 
 export async function create(req, res) {
-    const { category, icon } = req.body;
-    const menu = await createMenu(category, icon);
-    res.status(201).json(menu);
+    try {
+        const { category, icon } = req.body;
+        const menu = await createMenu(category, icon);
+        res.status(201).json(menu);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 }
 
 export async function update(req, res) {
     const { id } = req.params;
-    const { category, icon} = req.body;
+    const { category, icon } = req.body;
     const menu = await updateMenu(id, category, icon);
     res.status(200).json(menu);
 }

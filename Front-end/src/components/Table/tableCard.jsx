@@ -55,12 +55,8 @@ const TableCard = ({ table, onDelete }) => {
   }, [Today, currTable.id, currTable.seat, currTable.status]);
 
   const handleEditTable = async () => {
-    try {
-      const response = await axios.put(`http://localhost:3000/table/${currTable.id}`, { name, seat }, header);
-      setCurrTable(response.data);
-    } catch (error) {
-      console.error('Error updating table:', error);
-    }
+    const response = await axios.put(`http://localhost:3000/table/${currTable.id}`, { name, seat }, header);
+    setCurrTable(response.data);
   };
 
   const handleDeleteTable = () => {
@@ -84,7 +80,7 @@ const TableCard = ({ table, onDelete }) => {
   };
 
   return (
-    <div className="card bg-dark text-white p-3" style={{ width: '15rem', borderRadius: '0.5rem' }}>
+    <div className="card bg-dark text-white p-3 w-100" style={{ borderRadius: '0.5rem' }}>
       <div className="d-flex justify-content-between align-items-center mb-2">
         <h6 className="mb-0">
           Table <span className="fw-bold">→ {currTable.name}</span>

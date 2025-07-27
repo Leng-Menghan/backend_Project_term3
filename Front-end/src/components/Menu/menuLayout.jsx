@@ -2,6 +2,7 @@ import MenuCard from "./menuCard.jsx";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/authContext.jsx";
+import Swal from 'sweetalert2';
 const Menu = () => {
     const { auth } = useAuth();
     const token = localStorage.getItem('token');
@@ -24,9 +25,18 @@ const Menu = () => {
             category: category,
             icon: icon
         };
-        axios.post('http://localhost:3000/menu/create', data, header).then((response) => {
-            setMenus([...menus, response.data]);
-        });
+        axios.post('http://localhost:3000/menu/create', data, header)
+            .then((response) => {
+                setMenus([...menus, response.data]);
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Create Menu Failed',
+                    text: error.response.data.error,
+                    confirmButtonText: 'OK'
+                });
+            });
         setCategory('');
         setIcon('');
     }
@@ -48,7 +58,7 @@ const Menu = () => {
                             {menus.map((menu) => (
                                 <div
                                     key={menu.id}
-                                    className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-12 d-flex justify-content-center"
+                                    className="col-lg-12 d-flex justify-content-center"
                                 >
                                     <MenuCard menu={menu} onDelete={(id) => setMenus(menus.filter(menu => menu.id !== id))} />
                                 </div>
@@ -87,7 +97,7 @@ const Menu = () => {
                                             className="form-control"
                                             placeholder="Enter menu icon"
                                             value={icon}
-                                            onChange={(e) => setIcon(e.target.value)}
+                                            onChange={(e) => setIcon(e.target.value)}    
                                         />
                                     </div>
                                 </form>

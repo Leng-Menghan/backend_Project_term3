@@ -18,9 +18,11 @@ const itemCard = ({ item, onDelete }) => {
             name: name,
             price: price,
         }
-        axios.put('http://localhost:3000/item/' + curItem.id, data, header).then((response) => {
+        axios.put('http://localhost:3000/item/' + curItem.id, data, header)
+        .then((response) => {
             setCurItem(response.data);
         })
+        setName('');
     };
     const handleDeleteItem = () => {
         Swal.fire({
