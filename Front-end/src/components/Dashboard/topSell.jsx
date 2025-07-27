@@ -5,7 +5,7 @@ const topSell = ({name, quantity}) => {
                     <h5 className="mb-0 fw-bold ">📦 {name}</h5>
                 </div>
                 <div className="text-warning fw-semibold d-flex align-items-end justify-content-end">
-                    <h5 className="mb-0 fw-bold ">{quantity}</h5>
+                    <h5 className="mb-0 fw-bold ">× {quantity}</h5>
                 </div>
         </div>
     );

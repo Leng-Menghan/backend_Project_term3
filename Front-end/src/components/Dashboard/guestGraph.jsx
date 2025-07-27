@@ -8,7 +8,7 @@ function GuestGraph({labels, dataPoints}) {
     labels: labels,
     datasets: [
       {
-        label: 'Guest',
+        label: '👪 Guest',
         data: dataPoints,
         backgroundColor: [
           '#f87171',

@@ -55,6 +55,23 @@ const TableCard = ({ table, onDelete }) => {
   }, [Today, currTable.id, currTable.seat, currTable.status]);
 
   const handleEditTable = async () => {
+    if (name === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Name',
+        text: 'Name cannot be empty.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }else if(seat <= 0){
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Seat',
+        text: 'Seat must be greater than 0.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
     const response = await axios.put(`http://localhost:3000/table/${currTable.id}`, { name, seat }, header);
     setCurrTable(response.data);
   };

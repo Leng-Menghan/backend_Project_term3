@@ -16,14 +16,10 @@ async function main() {
         console.log("Connection has been established successfully.");
         await sequelize.sync({ force: true }); // or { force: true } to recreate tables
         console.log("✅ Models synced to the database");
-        await createTable("Table 1", "Available", 5);
-        await createMenu("Burgers", "🍔");
-        await createItem("Burger", 5.99, 1);
-        await createItem("Fries", 2.99, 1);
-        await createItem("Coke", 1.99, 1);
         await createUser("Leng Menghan", "Male", "1999-01-01", "Kandal", "012345678", "han@example.com", "123", "Admin");
         await createUser("Ren Sodalin", "Female", "1999-01-01", "Seam Reap", "012345678", "lin@example.com", "123", "Admin");
         await createUser("Soeun Sokvipor", "Female", "1999-01-01", "Svay Rieng", "012345678", "por@example.com", "123", "Admin");
+        await createUser("staff", "Female", "2000-01-01", "Phnom Penh", "012345678", "staff@example.com", "123", "Staff");
         const app = express();
         app.use(cors());
         app.use(express.json());

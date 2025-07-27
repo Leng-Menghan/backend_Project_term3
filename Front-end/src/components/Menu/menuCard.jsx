@@ -6,12 +6,12 @@ import Swal from 'sweetalert2';
 import { useAuth } from '../../context/authContext.jsx';
 const MenuCard = ({ menu, onDelete }) => {
     const { auth } = useAuth();
-      const token = localStorage.getItem('token');
-      const header = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
+    const token = localStorage.getItem('token');
+    const header = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    }
     // Item
     const [items, setItems] = useState([]);
     const [price, setPrice] = useState(0);
@@ -32,18 +32,35 @@ const MenuCard = ({ menu, onDelete }) => {
             price: price,
             menuId: curMenu.id
         }
-        axios.post('http://localhost:3000/item/create', data, header)
-        .then((response) => {
-            setItems([...items, response.data]);
-        })
-        .catch((error) => {
+        if (price <= 0) {
             Swal.fire({
                 icon: 'warning',
-                title: 'Create Item Failed',
-                text: error.response.data.error,
+                title: 'Invalid Price',
+                text: 'Price must be greater than 0.',
                 confirmButtonText: 'OK'
             });
-        });
+            return;
+        }else if (name === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Name',
+                text: 'Name cannot be empty.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        axios.post('http://localhost:3000/item/create', data, header)
+            .then((response) => {
+                setItems([...items, response.data]);
+            })
+            .catch((error) => {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Create Item Failed',
+                    text: error.response.data.error,
+                    confirmButtonText: 'OK'
+                });
+            });
         setName('');
         setPrice(0);
     }
@@ -54,9 +71,9 @@ const MenuCard = ({ menu, onDelete }) => {
             icon: icon
         }
         axios.put('http://localhost:3000/menu/' + curMenu.id, data, header)
-        .then((response) => {
-            setCurMenu(response.data);
-        })
+            .then((response) => {
+                setCurMenu(response.data);
+            })
     }
 
     const handleDeleteMenu = () => {
@@ -85,15 +102,15 @@ const MenuCard = ({ menu, onDelete }) => {
                     <div className="d-flex">
                         {auth?.role === 'Admin' && (
                             <>
-                               <button type="button" className="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target={`#addItemModal${curMenu.id}`}>
-                            <i class="fa-solid fa-square-plus" style={{ marginRight: '8px' }}></i>Add item
-                        </button>
-                        <button type="button" className="btn btn-outline-warning btn-sm ms-2" data-bs-toggle="modal" data-bs-target={`#editMenuModal${curMenu.id}`}>
-                            <i class="fa-solid fa-pen"></i>
-                        </button>
-                        <button type="button" className="btn btn-outline-danger btn-sm ms-2" onClick={handleDeleteMenu}>
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                                <button type="button" className="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target={`#addItemModal${curMenu.id}`}>
+                                    <i class="fa-solid fa-square-plus" style={{ marginRight: '8px' }}></i>Add item
+                                </button>
+                                <button type="button" className="btn btn-outline-warning btn-sm ms-2" data-bs-toggle="modal" data-bs-target={`#editMenuModal${curMenu.id}`}>
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button type="button" className="btn btn-outline-danger btn-sm ms-2" onClick={handleDeleteMenu}>
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
                             </>
                         )}
                     </div>
@@ -122,8 +139,8 @@ const MenuCard = ({ menu, onDelete }) => {
                                     <input type="text" id={`itemNameInput${curMenu.id}`} className="form-control" placeholder="Enter item name" onChange={(e) => setName(e.target.value)} value={name} />
                                 </div>
                                 <div className="mb-3">
-                                    <label htmlFor={`itemPriceInput${curMenu.id}`} className="form-label text-white">Price</label>
-                                    <input type="number" id={`itemPriceInput${curMenu.id}`} className="form-control" placeholder="Enter item price" onChange={(e) => setPrice(e.target.value)} value={price} />
+                                    <label htmlFor={`itemPriceInput${curMenu.id}`} className="form-label text-white">Price '$'</label>
+                                    <input type="number" id={`itemPriceInput${curMenu.id}`} className="form-control" placeholder="Enter item price" onChange={(e) => setPrice(e.target.value)} value={price} min={0} />
                                 </div>
                             </form>
                         </div>

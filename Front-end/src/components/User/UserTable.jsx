@@ -17,8 +17,9 @@ const UserTable = () => {
     // Fetch orders only once
     useEffect(() => {
         axios.get('http://localhost:3000/user/getUsers', header).then((response) => {
-            setUsers(response.data.filter((user) => user.role !== 'Admin'));
-            setFilteredUsers(response.data.filter((user) => user.role !== 'Admin')); // Set both at the same time
+            const sorted = response.data.filter((user) => user.role !== 'Admin').sort((a, b) => b.id - a.id);
+            setUsers(sorted);
+            setFilteredUsers(sorted); 
         });
     }, []);
 
@@ -61,7 +62,7 @@ const UserTable = () => {
         },
         cells: {
             style: {
-                fontSize: '0.8rem',
+                fontSize: '1rem',
                 borderRight: '1px solid #ddd',
                 padding: '8px 12px',
                 whiteSpace: 'nowrap',
@@ -104,7 +105,6 @@ const UserTable = () => {
             width: '100px',
         },
         {
-            id: 'date',
             name: 'Created At',
             selector: (row) =>
                 new Date(row.createdAt).toLocaleString('en-US', {
@@ -116,7 +116,6 @@ const UserTable = () => {
                     hour12: true,
                 }),
             minWidth: '120px',
-            sortable: true,
         },
         {
             name: 'Address',
@@ -208,8 +207,6 @@ const UserTable = () => {
                 responsive
                 striped
                 dense
-                defaultSortFieldId='date'
-                defaultSortAsc={false}
                 persistTableHead
                 subHeader
                 subHeaderComponent={

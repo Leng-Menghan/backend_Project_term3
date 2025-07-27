@@ -10,16 +10,16 @@ const handleBack = () => {
     window.history.back();
 }
 function toLocalDate(dateInput) {
-  const date = new Date(dateInput);
-  return date.toLocaleDateString('en-CA');
+    const date = new Date(dateInput);
+    return date.toLocaleDateString('en-CA');
 }
 const CreateOrder = () => {
-      const token = localStorage.getItem('token');
-      const header = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
+    const token = localStorage.getItem('token');
+    const header = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    }
     const navigate = useNavigate();
     const Today = toLocalDate(new Date());
 
@@ -53,11 +53,10 @@ const CreateOrder = () => {
 
         axios.get('http://localhost:3000/order/getOrders', header)
             .then(response => {
-                const filtered = response.data.filter(order =>
-                     {
-                        const orderDate = toLocalDate(order.createdAt);
-                        return orderDate === Today && (order.status === "In Progress" || order.status === "Ready");
-                     }
+                const filtered = response.data.filter(order => {
+                    const orderDate = toLocalDate(order.createdAt);
+                    return orderDate === Today && (order.status === "In Progress" || order.status === "Ready");
+                }
                 );
                 const aggregated = {};
                 filtered.forEach(({ tableId, guest }) => {
@@ -133,8 +132,13 @@ const CreateOrder = () => {
                     </button>
                 </div>
                 <form className="d-flex bg-success rounded p-2">
+                    <span className="text-warning fw-bold">Table:</span>
                     <div className="mx-3 d-flex align-items-center" style={{ width: '300px' }}>
-                        <select className="form-select" onChange={(e) => setTableId(Number(e.target.value))} value={tableId || ''}>
+                        <select
+                            className="form-select"
+                            onChange={(e) => setTableId(Number(e.target.value))}
+                            value={tableId || ''}
+                        >
                             <option disabled hidden value=''>Select Table</option>
                             {tables.map((table) => {
                                 const guestCount = tableSeats.find(t => t.tableId === table.id)?.guest || 0;
@@ -152,15 +156,32 @@ const CreateOrder = () => {
                             })}
                         </select>
                     </div>
+                    <span className="text-warning fw-bold">Guest:</span>
                     <div className="mx-3 d-flex align-items-center">
-                        <input
-                            type="number"
-                            className="form-control"
-                            placeholder="Number of Guest"
+
+                        <select
+                            className="form-select"
+                            value={guest}
                             onChange={(e) => setGuest(Number(e.target.value))}
-                        />
+                            disabled={!tableId} // disable until table is selected
+                        >
+                            <option disabled hidden value="">Select Guests</option>
+                            {(() => {
+                                const table = tables.find(t => t.id === tableId);
+                                const guestCount = tableSeats.find(t => t.tableId === tableId)?.guest || 0;
+                                const available = table ? table.seat - guestCount : 0;
+
+                                return [...Array(available).keys()].map(i => (
+                                    <option key={i + 1} value={i + 1}>
+                                        {i + 1}
+                                    </option>
+                                ));
+                            })()}
+                        </select>
                     </div>
+
                 </form>
+
             </div>
 
             {/* Content */}

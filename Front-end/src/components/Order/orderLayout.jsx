@@ -27,8 +27,7 @@ const OrderLayout = () => {
           return orderDate === today;
         }
         ) || [];
-        // Sort descending by createdAt
-        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        filtered.sort((a, b) => b.id - a.id);
         setOrders(filtered);
       })
   }, []);

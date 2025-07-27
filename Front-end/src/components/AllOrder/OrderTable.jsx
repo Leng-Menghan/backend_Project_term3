@@ -18,8 +18,9 @@ const OrderTable = () => {
     // Fetch orders only once
     useEffect(() => {
         axios.get('http://localhost:3000/order/getOrders', header).then((response) => {
-            setOrders(response.data);
-            setFilteredOrders(response.data); // Set both at the same time
+            const sorted = response.data.sort((a, b) => b.id - a.id);
+            setOrders(sorted);
+            setFilteredOrders(sorted); // Set both at the same time
         });
         axios.get('http://localhost:3000/table/getTables', header).then((response) => {
             setTables(response.data);
@@ -127,7 +128,6 @@ const OrderTable = () => {
             minWidth: '100px',
         },
         {
-            id: 'date',
             name: 'Date',
             selector: (row) =>
                 new Date(row.createdAt).toLocaleString('en-US', {
@@ -139,7 +139,6 @@ const OrderTable = () => {
                     hour12: true,
                 }),
             minWidth: '180px',
-            sortable: true,
             
         },
         {
@@ -286,8 +285,6 @@ const OrderTable = () => {
                     responsive
                     striped
                     dense
-                    defaultSortFieldId='date'
-                    defaultSortAsc={false}   
                     persistTableHead
                     subHeader
                     subHeaderComponent={

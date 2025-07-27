@@ -20,7 +20,8 @@ const Table = () => {
   const fetchTables = async () => {
     await axios.get("http://localhost:3000/table/getTables", header)
       .then((response) => {
-        setTables(response.data);
+        const sorted = response.data.sort((a, b) => b.id - a.id); 
+        setTables(sorted);
       });
   }
   useEffect(() => {
@@ -33,9 +34,26 @@ const Table = () => {
       name: name,
       seat: seat,
     };
+    if (seat <= 0) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Create Table Failed',
+        text: 'Seat must be greater than 0',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }else if (name === '') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Create Table Failed',
+        text: 'Name cannot be empty',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
     axios.post("http://localhost:3000/table/create", data, header)
       .then((response) => {
-        setTables([...tables, response.data]);
+        setTables([response.data, ...tables]);
       })
       .catch((error) => {
         Swal.fire({

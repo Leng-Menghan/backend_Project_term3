@@ -18,6 +18,23 @@ const itemCard = ({ item, onDelete }) => {
             name: name,
             price: price,
         }
+        if (price <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Price',
+                text: 'Price must be greater than 0.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }else if (name === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Name',
+                text: 'Name cannot be empty.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
         axios.put('http://localhost:3000/item/' + curItem.id, data, header)
         .then((response) => {
             setCurItem(response.data);
@@ -111,15 +128,16 @@ const itemCard = ({ item, onDelete }) => {
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor={`editItemPriceInput${curItem.id}`} className="form-label text-white">
-                                        Price
+                                        Price '$'
                                     </label>
                                     <input
-                                        type="text"
+                                        type="number"
                                         id={`editItemPriceInput${curItem.id}`}
                                         className="form-control"
                                         placeholder="Enter item price"
                                         onChange={(e) => setPrice(e.target.value)}
                                         value={price}
+                                        min={0}
                                     />
                                 </div>
                             </form>

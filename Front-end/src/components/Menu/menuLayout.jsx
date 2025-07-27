@@ -16,7 +16,8 @@ const Menu = () => {
     const [icon, setIcon] = useState('');
     useEffect(() => {
         axios.get('http://localhost:3000/menu/getMenus', header).then((response) => {
-            setMenus(response.data);
+            const sorted = response.data.sort((a, b) => b.id - a.id); 
+            setMenus(sorted);
         });
     }, []);
     const handleCreateMenu = (event) => {
@@ -27,7 +28,7 @@ const Menu = () => {
         };
         axios.post('http://localhost:3000/menu/create', data, header)
             .then((response) => {
-                setMenus([...menus, response.data]);
+                setMenus([response.data, ...menus]);
             })
             .catch((error) => {
                 Swal.fire({

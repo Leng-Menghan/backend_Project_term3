@@ -12,7 +12,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-function Income({labels, dataPoints}) {
+function Income({ labels, dataPoints }) {
   const data = {
     labels: labels,
     datasets: [
@@ -35,12 +35,20 @@ function Income({labels, dataPoints}) {
       title: { display: true, text: 'Income graph Line' },
     },
     scales: {
-      y: { beginAtZero: true },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function (value) {
+            return `$${value}`;
+          }
+        }
+      },
     },
   };
 
+
   return (
-        <Line data={data} options={options} className='bg-white w-100 p-2 rounded my-3'/>
+    <Line data={data} options={options} className='bg-white w-100 p-2 rounded my-3' />
   );
 }
 

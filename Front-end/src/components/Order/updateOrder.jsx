@@ -5,37 +5,38 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
-
+import Swal from 'sweetalert2';
 const handleBack = () => {
     window.history.back();
 }
 function toLocalDate(dateInput) {
-  const date = new Date(dateInput);
-  return date.toLocaleDateString('en-CA');
+    const date = new Date(dateInput);
+    return date.toLocaleDateString('en-CA');
 }
 const UpdateOrder = () => {
-      const token = localStorage.getItem('token');
-      const header = {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  }
+    const token = localStorage.getItem('token');
+    const header = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    }
     const navigate = useNavigate();
     const { id } = useParams();
     const Today = toLocalDate(new Date());
 
     const [orderedItems, setOrderedItems] = useState([]);
     const [selectedMenu, setSelectedMenu] = useState([]);
-// For create Order
+    // For create Order
     const [itemsList, setItemsList] = useState([]);
     const [guest, setGuest] = useState(0);
     const [tableId, setTableId] = useState(0);
     const [amount, setAmount] = useState(0);
     const [paymentStatus, setPaymentStatus] = useState('');
-// For get
+    // For get
+    const [oldGuest, setOldGuest] = useState(0);
     const [tables, setTables] = useState([]);
     const [menus, setMenus] = useState([]);
-        const [tableSeats, setTableSeats] = useState([]);
+    const [tableSeats, setTableSeats] = useState([]);
     const [items, setItems] = useState([]);
     const handleUpdateOrder = async () => {
         const data = {
@@ -45,6 +46,31 @@ const UpdateOrder = () => {
             amount: amount,
             paymentStatus: paymentStatus
         };
+        if (data.items.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Please select at least one item.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        } else if (data.guest === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Please enter guest count.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        } else if (data.tableId === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Information',
+                text: 'Please select a table.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
         try {
             const response = await axios.put(`http://localhost:3000/order/${id}`, data, header);
             console.log('Order created:', response.data);
@@ -57,33 +83,33 @@ const UpdateOrder = () => {
     useEffect(() => {
         axios.get(`http://localhost:3000/order/${id}`, header)
             .then(response => {
-            setOrderedItems(
-                response.data.items.map(item => ({...item,quantity: item.orderItem.quantity }))
-            );
-            setGuest(response.data.guest);
-            setTableId(response.data.tableId);
-            setAmount(response.data.amount);
-            setPaymentStatus(response.data.paymentStatus);
-        })
+                setOrderedItems(
+                    response.data.items.map(item => ({ ...item, quantity: item.orderItem.quantity }))
+                );
+                setOldGuest(response.data.guest);
+                setGuest(response.data.guest);
+                setTableId(response.data.tableId);
+                setAmount(response.data.amount);
+                setPaymentStatus(response.data.paymentStatus);
+            })
         axios.get('http://localhost:3000/table/getTables', header)
             .then(response => {
-            setTables(response.data);
-        })
+                setTables(response.data);
+            })
         axios.get('http://localhost:3000/menu/getMenus', header)
             .then(response => {
-            setMenus(response.data);
-        })
+                setMenus(response.data);
+            })
         axios.get('http://localhost:3000/item/getItems', header)
             .then(response => {
-            setItems(response.data);
-        })
+                setItems(response.data);
+            })
         axios.get('http://localhost:3000/order/getOrders', header)
             .then(response => {
-                const filtered = response.data.filter(order =>
-                     {
-                        const orderDate = toLocalDate(order.createdAt);
-                        return orderDate === Today && (order.status === "In Progress" || order.status === "Ready")
-                     }
+                const filtered = response.data.filter(order => {
+                    const orderDate = toLocalDate(order.createdAt);
+                    return orderDate === Today && (order.status === "In Progress" || order.status === "Ready")
+                }
                 );
                 const aggregated = {};
                 filtered.forEach(({ tableId, guest }) => {
@@ -116,20 +142,23 @@ const UpdateOrder = () => {
                     </button>
                 </div>
                 <form className="d-flex bg-success rounded p-2">
+                    <span className="text-warning fw-bold">Table:</span>
                     <div className="mx-3 d-flex align-items-center" style={{ width: '300px' }}>
-                        <select className="form-select" onChange={(e) => setTableId(e.target.value)} value={tableId}>
-                            <option selected disabled hidden>Select Table</option>
+                        <select
+                            className="form-select"
+                            onChange={(e) => setTableId(Number(e.target.value))}
+                            value={tableId || ''}
+                        >
+                            <option disabled hidden value=''>Select Table</option>
                             {tables.map((table) => {
-                                const guest = tableSeats.find(t => t.tableId === table.id)?.guest || 0;
-                                const availableSeat = table.seat - guest;
-                                if (availableSeat <= 0) {
-                                    return null;
-                                }
+                                const guestCount = tableSeats.find(t => t.tableId === table.id)?.guest || 0;
+                                const availableSeat = table.seat - guestCount + oldGuest;
                                 return (
                                     <option
                                         key={table.id}
                                         value={table.id}
-                                        className="text-success"
+                                        disabled={availableSeat <= 0}
+                                        className={availableSeat > 0 ? 'text-white bg-success' : 'text-white bg-danger'}
                                     >
                                         {table.name} - Available seat: {availableSeat}
                                     </option>
@@ -137,10 +166,32 @@ const UpdateOrder = () => {
                             })}
                         </select>
                     </div>
+                    <span className="text-warning fw-bold">Guest:</span>
                     <div className="mx-3 d-flex align-items-center">
-                        <input type="number" className="form-control" placeholder="Number of Guest" onChange={(e) => setGuest(e.target.value)} value={guest}/>
+
+                        <select
+                            className="form-select"
+                            value={guest}
+                            onChange={(e) => setGuest(Number(e.target.value))}
+                            disabled={!tableId} // disable until table is selected
+                        >
+                            <option disabled hidden value="">Select Guests</option>
+                            {(() => {
+                                const table = tables.find(t => t.id === tableId);
+                                const guestCount = tableSeats.find(t => t.tableId === tableId)?.guest || 0;
+                                const available = table ? (table.seat - guestCount + oldGuest) : 0;
+                                console.log(available);
+                                return [...Array(available).keys()].map(i => (
+                                    <option key={i + 1} value={i + 1}>
+                                        {i + 1}
+                                    </option>
+                                ));
+                            })()}
+                        </select>
                     </div>
+
                 </form>
+
             </div>
 
             {/* Content */}
