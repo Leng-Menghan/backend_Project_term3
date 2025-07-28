@@ -14,7 +14,7 @@ function Nav() {
     return (
         <nav className="navbar bg-black p-3">
             <div className="w-100 d-flex justify-content-between">
-                <a className="navbar-brand text-warning rounded d-flex align-items-center justify-content-center" style={{ width: '100px', background: '#28a745' }}>
+                <a className="navbar-brand text-warning rounded d-flex align-items-center justify-content-center" style={{ width: '100px' }}>
                     Cafe <img src="../../logo/logo.png" alt="" style={{width: '35px', height: '35px'}}/>
                 </a>
 

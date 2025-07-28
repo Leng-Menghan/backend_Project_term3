@@ -1,7 +1,15 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 const Footer = () => {
   const { auth } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    if(auth.role === 'Staff'){
+      navigate('/menu', { replace: true });
+    }
+  }, [auth])
   return (
     <footer className="bg-black text-white py-3 ">
       <div className="row">
